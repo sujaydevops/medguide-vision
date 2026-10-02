@@ -37,12 +37,9 @@ def verify(expected, detected):
     return {"status": status, "expected": expected, "detected": detected}
 
 def gemini_generate(parts, system_instruction):
-    key = os.getenv("GEMINI_API_KEY")
-    if not key:
-        raise RuntimeError("GEMINI_API_KEY is not configured.")
     try:
         from google import genai
-        client = genai.Client(api_key=key)
+        client = genai.Client(vertexai=True, project="project-24ac780f-6279-48f7-875", location="global")
         model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
         prompt = system_instruction + "\nReturn valid JSON only."
         contents = [prompt] + parts

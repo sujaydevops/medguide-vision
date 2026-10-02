@@ -1,87 +1,473 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MedGuide Vision</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
 <main class="shell">
-<header><div class="brand">✦ MedGuide Vision</div><span class="badge">Hackathon prototype · Demo only</span></header>
+
+<header>
+  <div class="brand">✦ MedGuide Vision</div>
+  <span class="badge">Hackathon prototype · Demo only</span>
+</header>
 
 <section id="hero" class="card hero">
-<h1>Medication information,<br>easier to see, hear & understand.</h1>
-<p>Use Gemini to structure an existing prescription, confirm it, then compare a medication label against the confirmed information.</p>
-<div class="notice"><strong>Important:</strong> This prototype does not prescribe medication or determine whether medicine is safe to take.</div>
-<button onclick="show('setup')">Get started</button>
+  <h1>Medication information,<br>easier to see, hear & understand.</h1>
+
+  <p>
+    Use Gemini to structure an existing prescription, confirm it,
+    then compare a medication label against the confirmed information.
+  </p>
+
+  <div class="notice">
+    <strong>Important:</strong>
+    This prototype does not prescribe medication or determine whether
+    medicine is safe to take.
+  </div>
+
+  <button onclick="show('setup')">Get started</button>
 </section>
 
+
 <section id="setup" class="card hidden">
+
 <h2>1 · Choose language</h2>
-<select id="language"><option>English</option><option>Nepali</option><option>Hindi</option><option>Spanish</option><option>Chinese</option></select>
+
+<label for="language"><strong>Preferred language</strong></label>
+
+<select id="language">
+<option value="English">English</option>
+<option value="Nepali">नेपाली — Nepali</option>
+<option value="Hindi">हिन्दी — Hindi</option>
+<option value="Spanish">Español — Spanish</option>
+<option value="Chinese Simplified">简体中文 — Chinese (Simplified)</option>
+<option value="Chinese Traditional">繁體中文 — Chinese (Traditional)</option>
+<option value="Arabic">العربية — Arabic</option>
+<option value="Bengali">বাংলা — Bengali</option>
+<option value="Portuguese">Português — Portuguese</option>
+<option value="Russian">Русский — Russian</option>
+<option value="Japanese">日本語 — Japanese</option>
+<option value="Punjabi">ਪੰਜਾਬੀ — Punjabi</option>
+<option value="German">Deutsch — German</option>
+<option value="French">Français — French</option>
+<option value="Urdu">اردو — Urdu</option>
+<option value="Indonesian">Bahasa Indonesia — Indonesian</option>
+<option value="Italian">Italiano — Italian</option>
+<option value="Marathi">मराठी — Marathi</option>
+<option value="Telugu">తెలుగు — Telugu</option>
+<option value="Turkish">Türkçe — Turkish</option>
+<option value="Tamil">தமிழ் — Tamil</option>
+<option value="Vietnamese">Tiếng Việt — Vietnamese</option>
+<option value="Korean">한국어 — Korean</option>
+<option value="Persian">فارسی — Persian</option>
+<option value="Gujarati">ગુજરાતી — Gujarati</option>
+<option value="Polish">Polski — Polish</option>
+<option value="Ukrainian">Українська — Ukrainian</option>
+<option value="Malayalam">മലയാളം — Malayalam</option>
+<option value="Kannada">ಕನ್ನಡ — Kannada</option>
+<option value="Odia">ଓଡ଼ିଆ — Odia</option>
+<option value="Burmese">မြန်မာ — Burmese</option>
+<option value="Thai">ไทย — Thai</option>
+<option value="Dutch">Nederlands — Dutch</option>
+<option value="Greek">Ελληνικά — Greek</option>
+<option value="Romanian">Română — Romanian</option>
+<option value="Czech">Čeština — Czech</option>
+<option value="Hungarian">Magyar — Hungarian</option>
+<option value="Swedish">Svenska — Swedish</option>
+<option value="Danish">Dansk — Danish</option>
+<option value="Finnish">Suomi — Finnish</option>
+<option value="Norwegian">Norsk — Norwegian</option>
+<option value="Hebrew">עברית — Hebrew</option>
+<option value="Malay">Bahasa Melayu — Malay</option>
+<option value="Filipino">Filipino</option>
+<option value="Swahili">Kiswahili — Swahili</option>
+<option value="Afrikaans">Afrikaans</option>
+<option value="Amharic">አማርኛ — Amharic</option>
+<option value="Albanian">Shqip — Albanian</option>
+<option value="Armenian">Հայերեն — Armenian</option>
+<option value="Azerbaijani">Azərbaycanca — Azerbaijani</option>
+<option value="Basque">Euskara — Basque</option>
+<option value="Belarusian">Беларуская — Belarusian</option>
+<option value="Bosnian">Bosanski — Bosnian</option>
+<option value="Bulgarian">Български — Bulgarian</option>
+<option value="Catalan">Català — Catalan</option>
+<option value="Croatian">Hrvatski — Croatian</option>
+<option value="Estonian">Eesti — Estonian</option>
+<option value="Georgian">ქართული — Georgian</option>
+<option value="Haitian Creole">Kreyòl Ayisyen — Haitian Creole</option>
+<option value="Hausa">Hausa</option>
+<option value="Icelandic">Íslenska — Icelandic</option>
+<option value="Irish">Gaeilge — Irish</option>
+<option value="Javanese">Basa Jawa — Javanese</option>
+<option value="Kazakh">Қазақша — Kazakh</option>
+<option value="Khmer">ខ្មែរ — Khmer</option>
+<option value="Kyrgyz">Кыргызча — Kyrgyz</option>
+<option value="Lao">ລາວ — Lao</option>
+<option value="Latvian">Latviešu — Latvian</option>
+<option value="Lithuanian">Lietuvių — Lithuanian</option>
+<option value="Macedonian">Македонски — Macedonian</option>
+<option value="Malagasy">Malagasy</option>
+<option value="Maltese">Malti — Maltese</option>
+<option value="Mongolian">Монгол — Mongolian</option>
+<option value="Pashto">پښتو — Pashto</option>
+<option value="Serbian">Српски — Serbian</option>
+<option value="Sinhala">සිංහල — Sinhala</option>
+<option value="Slovak">Slovenčina — Slovak</option>
+<option value="Slovenian">Slovenščina — Slovenian</option>
+<option value="Somali">Soomaali — Somali</option>
+<option value="Sundanese">Basa Sunda — Sundanese</option>
+<option value="Tajik">Тоҷикӣ — Tajik</option>
+<option value="Uzbek">Oʻzbek — Uzbek</option>
+<option value="Welsh">Cymraeg — Welsh</option>
+<option value="Yoruba">Yorùbá — Yoruba</option>
+<option value="Zulu">isiZulu — Zulu</option>
+<option value="Igbo">Igbo</option>
+<option value="Galician">Galego — Galician</option>
+<option value="Esperanto">Esperanto</option>
+<option value="Latin">Latina — Latin</option>
+<option value="Luxembourgish">Lëtzebuergesch — Luxembourgish</option>
+<option value="Maori">Māori</option>
+<option value="Samoan">Gagana Samoa — Samoan</option>
+<option value="Scots Gaelic">Gàidhlig — Scots Gaelic</option>
+<option value="Shona">Shona</option>
+<option value="Sindhi">سنڌي — Sindhi</option>
+<option value="Sesotho">Sesotho</option>
+<option value="Turkmen">Türkmençe — Turkmen</option>
+<option value="Uyghur">ئۇيغۇرچە — Uyghur</option>
+<option value="Xhosa">isiXhosa — Xhosa</option>
+<option value="Kurdish">Kurdî — Kurdish</option>
+</select>
+
+
 <h2>2 · Add prescription</h2>
-<p class="muted">For the demo, paste prescription text or upload/take a photo.</p>
+
+<p class="muted">
+For the demo, paste prescription text or upload/take a photo.
+</p>
+
 <textarea id="rxText" rows="6">DEMO PRESCRIPTION
 Metformin 500 mg
 Take 1 tablet at 8 AM and 1 tablet at 8 PM.
 Follow-up: October 20, 2026</textarea>
-<input id="rxFile" type="file" accept="image/*" capture="environment">
-<button onclick="analyzeRx()">✨ Analyze with Gemini</button>
+
+<input
+  id="rxFile"
+  type="file"
+  accept="image/*"
+  capture="environment">
+
+<button onclick="analyzeRx()">
+✨ Analyze with Gemini
+</button>
+
 <div id="rxStatus" class="status"></div>
+
 </section>
+
 
 <section id="review" class="card hidden">
+
 <h2>Review before saving</h2>
-<p>Gemini detected the following. Edit anything that is incorrect before confirming.</p>
+
+<p>
+Gemini detected the following. Edit anything that is incorrect before confirming.
+</p>
+
 <div class="grid">
-<label>Medicine<input id="rName"></label>
-<label>Strength<input id="rStrength"></label>
-<label>Quantity<input id="rQuantity"></label>
-<label>Times<input id="rTimes"></label>
-<label class="wide">Instructions<textarea id="rInstructions"></textarea></label>
-<label>Follow-up<input id="rFollow"></label>
+
+<label>
+Medicine
+<input id="rName">
+</label>
+
+<label>
+Strength
+<input id="rStrength">
+</label>
+
+<label>
+Quantity
+<input id="rQuantity">
+</label>
+
+<label>
+Times
+<input id="rTimes">
+</label>
+
+<label class="wide">
+Instructions
+<textarea id="rInstructions"></textarea>
+</label>
+
+<label>
+Follow-up
+<input id="rFollow">
+</label>
+
 </div>
-<button onclick="confirmRx()">Confirm prescription</button>
-<button class="secondary" onclick="show('setup')">Back</button>
+
+<button onclick="confirmRx()">
+Confirm prescription
+</button>
+
+<button class="secondary" onclick="show('setup')">
+Back
+</button>
+
 </section>
+
 
 <section id="dashboard" class="card hidden">
-<div class="row"><div><span class="eyebrow">CONFIRMED PRESCRIPTION</span><h2 id="dName">—</h2><div class="strength" id="dStrength">—</div></div><button class="voice" onclick="speakCurrent()">🔊 Read aloud</button></div>
+
+<div class="row">
+
+<div>
+<span class="eyebrow">CONFIRMED PRESCRIPTION</span>
+<h2 id="dName">—</h2>
+<div class="strength" id="dStrength">—</div>
+</div>
+
+<button class="voice" onclick="speakCurrent()">
+🔊 Read aloud
+</button>
+
+</div>
+
 <p id="dInstructions"></p>
-<div class="timebox">Scheduled times: <strong id="dTimes">—</strong></div>
+
+<div class="timebox">
+Scheduled times:
+<strong id="dTimes">—</strong>
+</div>
+
 <p id="dFollow"></p>
+
+
+<div style="margin-top:20px">
+
+<label for="dashboardLanguage">
+<strong>🌎 Explain this information in:</strong>
+</label>
+
+<select
+id="dashboardLanguage"
+onchange="document.getElementById('language').value=this.value">
+
+<option value="English">English</option>
+<option value="Nepali">नेपाली — Nepali</option>
+<option value="Hindi">हिन्दी — Hindi</option>
+<option value="Spanish">Español — Spanish</option>
+<option value="Chinese Simplified">简体中文 — Chinese</option>
+<option value="Arabic">العربية — Arabic</option>
+<option value="Bengali">বাংলা — Bengali</option>
+<option value="Portuguese">Português — Portuguese</option>
+<option value="Russian">Русский — Russian</option>
+<option value="Japanese">日本語 — Japanese</option>
+<option value="Punjabi">ਪੰਜਾਬੀ — Punjabi</option>
+<option value="German">Deutsch — German</option>
+<option value="French">Français — French</option>
+<option value="Urdu">اردو — Urdu</option>
+<option value="Italian">Italiano — Italian</option>
+<option value="Tamil">தமிழ் — Tamil</option>
+<option value="Telugu">తెలుగు — Telugu</option>
+<option value="Vietnamese">Tiếng Việt — Vietnamese</option>
+<option value="Korean">한국어 — Korean</option>
+<option value="Thai">ไทย — Thai</option>
+<option value="Greek">Ελληνικά — Greek</option>
+<option value="Hebrew">עברית — Hebrew</option>
+<option value="Swahili">Kiswahili — Swahili</option>
+<option value="Somali">Soomaali — Somali</option>
+<option value="Amharic">አማርኛ — Amharic</option>
+<option value="Persian">فارسی — Persian</option>
+<option value="Gujarati">ગુજરાતી — Gujarati</option>
+<option value="Marathi">मराठी — Marathi</option>
+<option value="Malayalam">മലയാളം — Malayalam</option>
+<option value="Kannada">ಕನ್ನಡ — Kannada</option>
+<option value="Sinhala">සිංහල — Sinhala</option>
+<option value="Burmese">မြန်မာ — Burmese</option>
+<option value="Indonesian">Bahasa Indonesia — Indonesian</option>
+<option value="Malay">Bahasa Melayu — Malay</option>
+<option value="Filipino">Filipino</option>
+<option value="Dutch">Nederlands — Dutch</option>
+<option value="Polish">Polski — Polish</option>
+<option value="Ukrainian">Українська — Ukrainian</option>
+<option value="Romanian">Română — Romanian</option>
+<option value="Turkish">Türkçe — Turkish</option>
+<option value="Czech">Čeština — Czech</option>
+<option value="Hungarian">Magyar — Hungarian</option>
+<option value="Swedish">Svenska — Swedish</option>
+<option value="Danish">Dansk — Danish</option>
+<option value="Finnish">Suomi — Finnish</option>
+<option value="Norwegian">Norsk — Norwegian</option>
+<option value="Afrikaans">Afrikaans</option>
+<option value="Albanian">Shqip — Albanian</option>
+<option value="Armenian">Հայերեն — Armenian</option>
+<option value="Azerbaijani">Azərbaycanca — Azerbaijani</option>
+<option value="Basque">Euskara — Basque</option>
+<option value="Belarusian">Беларуская — Belarusian</option>
+<option value="Bosnian">Bosanski — Bosnian</option>
+<option value="Bulgarian">Български — Bulgarian</option>
+<option value="Catalan">Català — Catalan</option>
+<option value="Croatian">Hrvatski — Croatian</option>
+<option value="Estonian">Eesti — Estonian</option>
+<option value="Georgian">ქართული — Georgian</option>
+<option value="Haitian Creole">Kreyòl Ayisyen</option>
+<option value="Hausa">Hausa</option>
+<option value="Icelandic">Íslenska — Icelandic</option>
+<option value="Irish">Gaeilge — Irish</option>
+<option value="Javanese">Basa Jawa — Javanese</option>
+<option value="Kazakh">Қазақша — Kazakh</option>
+<option value="Khmer">ខ្មែរ — Khmer</option>
+<option value="Kyrgyz">Кыргызча — Kyrgyz</option>
+<option value="Lao">ລາວ — Lao</option>
+<option value="Latvian">Latviešu — Latvian</option>
+<option value="Lithuanian">Lietuvių — Lithuanian</option>
+<option value="Macedonian">Македонски — Macedonian</option>
+<option value="Malagasy">Malagasy</option>
+<option value="Maltese">Malti — Maltese</option>
+<option value="Mongolian">Монгол — Mongolian</option>
+<option value="Pashto">پښتو — Pashto</option>
+<option value="Serbian">Српски — Serbian</option>
+<option value="Slovak">Slovenčina — Slovak</option>
+<option value="Slovenian">Slovenščina — Slovenian</option>
+<option value="Sundanese">Basa Sunda — Sundanese</option>
+<option value="Tajik">Тоҷикӣ — Tajik</option>
+<option value="Uzbek">Oʻzbek — Uzbek</option>
+<option value="Welsh">Cymraeg — Welsh</option>
+<option value="Yoruba">Yorùbá — Yoruba</option>
+<option value="Zulu">isiZulu — Zulu</option>
+<option value="Igbo">Igbo</option>
+<option value="Galician">Galego — Galician</option>
+<option value="Esperanto">Esperanto</option>
+<option value="Latin">Latina — Latin</option>
+<option value="Luxembourgish">Lëtzebuergesch</option>
+<option value="Maori">Māori</option>
+<option value="Samoan">Gagana Samoa — Samoan</option>
+<option value="Scots Gaelic">Gàidhlig — Scots Gaelic</option>
+<option value="Shona">Shona</option>
+<option value="Sindhi">سنڌي — Sindhi</option>
+<option value="Sesotho">Sesotho</option>
+<option value="Turkmen">Türkmençe — Turkmen</option>
+<option value="Uyghur">ئۇيغۇرچە — Uyghur</option>
+<option value="Xhosa">isiXhosa — Xhosa</option>
+<option value="Kurdish">Kurdî — Kurdish</option>
+
+</select>
+
+</div>
+
+
 <div id="translation"></div>
-<button onclick="translateCurrent()">🌎 Explain in selected language</button>
-<button onclick="show('scanner')">📷 Check my medication label</button>
+
+<button onclick="translateCurrent()">
+🌎 Explain in selected language
+</button>
+
+<button onclick="show('scanner')">
+📷 Check my medication label
+</button>
+
 </section>
+
 
 <section id="scanner" class="card hidden">
+
 <h2>Check medication label</h2>
-<p>Point the camera at the pharmacy/demo label. Gemini reads the visible name and strength; deterministic code performs the comparison.</p>
+
+<p>
+Point the camera at the pharmacy/demo label.
+Gemini reads the visible name and strength;
+deterministic code performs the comparison.
+</p>
+
 <video id="video" autoplay playsinline></video>
 <canvas id="canvas" class="hidden"></canvas>
+
 <div class="buttons">
-<button onclick="startCamera()">Start camera</button>
-<button onclick="captureLabel()">Capture & analyze</button>
+
+<button onclick="startCamera()">
+Start camera
+</button>
+
+<button onclick="captureLabel()">
+Capture & analyze
+</button>
+
 </div>
+
 <p class="or">or upload a label image</p>
-<input id="labelFile" type="file" accept="image/*" capture="environment">
-<button onclick="analyzeUploadedLabel()">Analyze uploaded label</button>
-<details><summary>Demo fallback: type visible label text</summary>
-<textarea id="labelText" rows="3" placeholder="Metformin 500 mg"></textarea>
-<button onclick="analyzeLabelText()">Analyze demo text</button></details>
+
+<input
+id="labelFile"
+type="file"
+accept="image/*"
+capture="environment">
+
+<button onclick="analyzeUploadedLabel()">
+Analyze uploaded label
+</button>
+
+<details>
+
+<summary>
+Demo fallback: type visible label text
+</summary>
+
+<textarea
+id="labelText"
+rows="3"
+placeholder="Metformin 500 mg"></textarea>
+
+<button onclick="analyzeLabelText()">
+Analyze demo text
+</button>
+
+</details>
+
 <div id="scanStatus" class="status"></div>
-<button class="secondary" onclick="show('dashboard')">Back to dashboard</button>
+
+<button
+class="secondary"
+onclick="show('dashboard')">
+Back to dashboard
+</button>
+
 </section>
+
 
 <section id="result" class="card hidden">
+
 <div id="resultBox"></div>
-<button onclick="speakResult()">🔊 Read result</button>
-<button onclick="show('scanner')">Scan another label</button>
-<button class="secondary" onclick="show('dashboard')">Dashboard</button>
+
+<button onclick="speakResult()">
+🔊 Read result
+</button>
+
+<button onclick="show('scanner')">
+Scan another label
+</button>
+
+<button
+class="secondary"
+onclick="show('dashboard')">
+Dashboard
+</button>
+
 </section>
 
-<footer>MedGuide Vision · DEMO / NOT FOR MEDICAL USE</footer>
+
+<footer>
+MedGuide Vision · DEMO / NOT FOR MEDICAL USE
+</footer>
+
 </main>
+
 <script src="/static/app.js"></script>
-</body></html>
+
+</body>
+</html>
