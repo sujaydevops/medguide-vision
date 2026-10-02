@@ -1,87 +1,148 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MedGuide Vision</title>
-<link rel="stylesheet" href="/static/style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ede7e3">
+  <meta name="description" content="Review existing prescription information, hear it aloud, and compare medication labels. MedGuide Vision is a demo accessibility prototype, not for medical use.">
+  <title>MedGuide Vision</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<main class="shell">
-<header><div class="brand">✦ MedGuide Vision</div><span class="badge">Hackathon prototype · Demo only</span></header>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+      <symbol id="icon-document" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Zm0 0v6h6M8 13h8m-8 4h5"/></symbol>
+      <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+      <symbol id="icon-scan" viewBox="0 0 24 24"><path d="M8 3H4a1 1 0 0 0-1 1v4m13-5h4a1 1 0 0 1 1 1v4M3 16v4a1 1 0 0 0 1 1h4m8 0h4a1 1 0 0 0 1-1v-4M7 9h10M7 12h10M7 15h6"/></symbol>
+      <symbol id="icon-voice" viewBox="0 0 24 24"><path d="m11 4-6 5H2v6h3l6 5Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>
+      <symbol id="icon-language" viewBox="0 0 24 24"><path d="M3 5h12M9 3v2m4 0c-1 6-5 9-10 11m2-8c1 3 4 6 7 7m1 6 4-11h1l4 11m-7-4h5"/></symbol>
+      <symbol id="icon-camera" viewBox="0 0 24 24"><path d="m8 4-2 3H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2l-2-3Z"/><circle cx="12" cy="13" r="4"/></symbol>
+      <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+      <symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/></symbol>
+    </defs>
+  </svg>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <main class="shell" id="content" tabindex="-1">
+    <header class="app-header">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M7 5H4v7m21-7h3v7M4 20v7h7m17-7v7h-7M16 8v16M8 16h16"/></svg></span><span>MedGuide <span class="brand-light">Vision</span></span></div>
+      <span class="badge"><span class="demo-dot" aria-hidden="true"></span>Hackathon prototype <span class="badge-divider" aria-hidden="true">/</span> Demo only</span>
+    </header>
 
-<section id="hero" class="card hero">
-<h1>Medication information,<br>easier to see, hear & understand.</h1>
-<p>Use Gemini to structure an existing prescription, confirm it, then compare a medication label against the confirmed information.</p>
-<div class="notice"><strong>Important:</strong> This prototype does not prescribe medication or determine whether medicine is safe to take.</div>
-<button onclick="show('setup')">Get started</button>
-</section>
+    <section id="hero" class="hero" aria-labelledby="welcome-title">
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span>A little clarity. A little independence.</p>
+          <h1 id="welcome-title">Medication information,<br><em>easier</em> to see, hear &amp; understand.</h1>
+          <p class="hero-description">Read an existing prescription in your language. Review the details. Compare your medication label with the information you confirmed.</p>
+          <button class="hero-cta" onclick="show('setup')">Get started <svg class="icon" aria-hidden="true"><use href="#icon-arrow"/></svg></button>
+          <p class="hero-caption">Your prescription is the starting point. You stay in control.</p>
+        </div>
+        <aside class="journey" aria-labelledby="journey-title">
+          <div class="journey-heading"><span class="eyebrow">How it works</span><svg class="icon" aria-hidden="true"><use href="#icon-document"/></svg></div>
+          <h2 id="journey-title">From a prescription<br>to a clearer picture.</h2>
+          <ol class="journey-list">
+            <li><span class="step-number" aria-hidden="true">01</span><div><h3>Add your prescription</h3><p>Upload a photo or paste the text for Gemini to read.</p></div></li>
+            <li><span class="step-number" aria-hidden="true">02</span><div><h3>Review before saving</h3><p>Check the extracted information and explicitly confirm it.</p></div></li>
+            <li><span class="step-number" aria-hidden="true">03</span><div><h3>Compare your label</h3><p>Check the visible name and strength against your confirmed prescription.</p></div></li>
+          </ol>
+          <div class="journey-footnote"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg><span>Missing information is never filled in.</span></div>
+        </aside>
+      </div>
+      <div class="accessibility-strip" aria-label="Accessibility features">
+        <span><svg class="icon" aria-hidden="true"><use href="#icon-language"/></svg>Explanations in your language</span>
+        <span><svg class="icon" aria-hidden="true"><use href="#icon-voice"/></svg>Optional read-aloud support</span>
+        <span><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg>Reviewed and confirmed by you</span>
+      </div>
+      <div class="notice hero-notice"><svg class="icon" aria-hidden="true"><use href="#icon-info"/></svg><p><strong>Information, with care.</strong> This prototype does not prescribe medication or determine whether medicine is safe to take.</p></div>
+    </section>
 
-<section id="setup" class="card hidden">
-<h2>1 · Choose language</h2>
-<select id="language"><option>English</option><option>Nepali</option><option>Hindi</option><option>Spanish</option><option>Chinese</option></select>
-<h2>2 · Add prescription</h2>
-<p class="muted">For the demo, paste prescription text or upload/take a photo.</p>
-<textarea id="rxText" rows="6">DEMO PRESCRIPTION
+    <section id="setup" class="card hidden" aria-labelledby="setup-title">
+      <div class="section-heading"><p class="eyebrow">Your prescription · 01</p><h2 id="setup-title">Start with what you have.</h2><p>Choose a language, then add the prescription you want to understand.</p></div>
+      <div class="setup-layout">
+        <div class="language-panel">
+          <span class="panel-icon" aria-hidden="true"><svg class="icon"><use href="#icon-language"/></svg></span>
+          <h3>1 · Choose language</h3><p class="muted">For the explanation of your confirmed prescription.</p>
+          <label for="language">Explanation language</label>
+          <select id="language"><option>English</option><option>Nepali</option><option>Hindi</option><option>Spanish</option><option>Chinese</option></select>
+          <p class="field-hint">Original medication information remains available alongside the explanation.</p>
+        </div>
+        <div class="prescription-panel">
+          <h3>2 · Add prescription</h3><p class="muted">Paste prescription text or upload/take a photo.</p>
+          <div class="field-heading"><label for="rxText">Prescription text</label><span class="demo-label">DEMO / NOT FOR MEDICAL USE</span></div>
+          <textarea id="rxText" rows="6">DEMO PRESCRIPTION
 Metformin 500 mg
 Take 1 tablet at 8 AM and 1 tablet at 8 PM.
 Follow-up: October 20, 2026</textarea>
-<input id="rxFile" type="file" accept="image/*" capture="environment">
-<button onclick="analyzeRx()">✨ Analyze with Gemini</button>
-<div id="rxStatus" class="status"></div>
-</section>
+          <div class="upload-field"><label for="rxFile"><svg class="icon" aria-hidden="true"><use href="#icon-document"/></svg>Or add a prescription photo</label><input id="rxFile" type="file" accept="image/*" capture="environment"></div>
+          <div class="actions"><button onclick="analyzeRx()">Analyze with Gemini <svg class="icon" aria-hidden="true"><use href="#icon-arrow"/></svg></button></div>
+          <p class="field-hint">You will review the extracted information before saving.</p>
+          <div id="rxStatus" class="status" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
 
-<section id="review" class="card hidden">
-<h2>Review before saving</h2>
-<p>Gemini detected the following. Edit anything that is incorrect before confirming.</p>
-<div class="grid">
-<label>Medicine<input id="rName"></label>
-<label>Strength<input id="rStrength"></label>
-<label>Quantity<input id="rQuantity"></label>
-<label>Times<input id="rTimes"></label>
-<label class="wide">Instructions<textarea id="rInstructions"></textarea></label>
-<label>Follow-up<input id="rFollow"></label>
-</div>
-<button onclick="confirmRx()">Confirm prescription</button>
-<button class="secondary" onclick="show('setup')">Back</button>
-</section>
+    <section id="review" class="card hidden" aria-labelledby="review-title">
+      <div class="section-heading"><p class="eyebrow">Your prescription · 02</p><h2 id="review-title">Review before saving</h2><p>Gemini detected the following. Edit anything that is incorrect before confirming.</p></div>
+      <div class="notice"><svg class="icon" aria-hidden="true"><use href="#icon-info"/></svg><p>Compare these details with the source prescription. <strong>Leave missing information blank.</strong></p></div>
+      <div class="grid review-fields">
+        <label>Medicine<input id="rName"></label>
+        <label>Strength<input id="rStrength"></label>
+        <label>Quantity<input id="rQuantity"></label>
+        <label>Times<input id="rTimes" aria-describedby="times-hint"><span id="times-hint" class="field-hint">Separate multiple times with a comma.</span></label>
+        <label class="wide">Instructions<textarea id="rInstructions" rows="3"></textarea></label>
+        <label>Follow-up<input id="rFollow"></label>
+      </div>
+      <div class="actions section-actions"><button onclick="confirmRx()"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg>Confirm prescription</button><button class="secondary" onclick="show('setup')">Back</button></div>
+    </section>
 
-<section id="dashboard" class="card hidden">
-<div class="row"><div><span class="eyebrow">CONFIRMED PRESCRIPTION</span><h2 id="dName">—</h2><div class="strength" id="dStrength">—</div></div><button class="voice" onclick="speakCurrent()">🔊 Read aloud</button></div>
-<p id="dInstructions"></p>
-<div class="timebox">Scheduled times: <strong id="dTimes">—</strong></div>
-<p id="dFollow"></p>
-<div id="translation"></div>
-<button onclick="translateCurrent()">🌎 Explain in selected language</button>
-<button onclick="show('scanner')">📷 Check my medication label</button>
-</section>
+    <section id="dashboard" class="card hidden" aria-labelledby="dashboard-title">
+      <div class="section-heading"><p class="eyebrow">Your prescription · 03</p><h2 id="dashboard-title">Your medication, at a glance.</h2><p>The information you reviewed and confirmed, together in one place.</p></div>
+      <div class="dashboard-layout">
+        <div class="medication-panel">
+          <div class="row"><div><span class="eyebrow confirmed-label"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg>Confirmed prescription</span><h3 id="dName">—</h3><div class="strength" id="dStrength">—</div></div><button class="voice" onclick="speakCurrent()"><svg class="icon" aria-hidden="true"><use href="#icon-voice"/></svg>Read aloud</button></div>
+          <div class="instructions-block"><h4>Prescription instructions</h4><p id="dInstructions"></p></div>
+          <div class="timebox"><svg class="icon" aria-hidden="true"><use href="#icon-clock"/></svg><div><span>Scheduled times</span><strong id="dTimes">—</strong></div></div>
+          <p id="dFollow" class="follow-up"></p>
+        </div>
+        <aside class="dashboard-tools" aria-label="Prescription tools">
+          <div class="tool-block"><svg class="icon tool-icon" aria-hidden="true"><use href="#icon-language"/></svg><h3>A little easier to understand.</h3><p>View an explanation in the language you selected.</p><button class="secondary" onclick="translateCurrent()">Explain in selected language <svg class="icon" aria-hidden="true"><use href="#icon-arrow"/></svg></button></div>
+          <div class="tool-block"><svg class="icon tool-icon" aria-hidden="true"><use href="#icon-scan"/></svg><h3>Have the label in front of you?</h3><p>Compare its name and strength with your confirmed prescription.</p><button onclick="show('scanner')">Check my medication label <svg class="icon" aria-hidden="true"><use href="#icon-arrow"/></svg></button></div>
+        </aside>
+      </div>
+      <div id="translation" class="translation" role="status" aria-live="polite"></div>
+    </section>
 
-<section id="scanner" class="card hidden">
-<h2>Check medication label</h2>
-<p>Point the camera at the pharmacy/demo label. Gemini reads the visible name and strength; deterministic code performs the comparison.</p>
-<video id="video" autoplay playsinline></video>
-<canvas id="canvas" class="hidden"></canvas>
-<div class="buttons">
-<button onclick="startCamera()">Start camera</button>
-<button onclick="captureLabel()">Capture & analyze</button>
-</div>
-<p class="or">or upload a label image</p>
-<input id="labelFile" type="file" accept="image/*" capture="environment">
-<button onclick="analyzeUploadedLabel()">Analyze uploaded label</button>
-<details><summary>Demo fallback: type visible label text</summary>
-<textarea id="labelText" rows="3" placeholder="Metformin 500 mg"></textarea>
-<button onclick="analyzeLabelText()">Analyze demo text</button></details>
-<div id="scanStatus" class="status"></div>
-<button class="secondary" onclick="show('dashboard')">Back to dashboard</button>
-</section>
+    <section id="scanner" class="card hidden" aria-labelledby="scanner-title">
+      <div class="section-heading"><p class="eyebrow">Label comparison</p><h2 id="scanner-title">Check medication label</h2><p>Point the camera at the pharmacy/demo label. Keep the medication name and strength clearly visible.</p></div>
+      <div class="scanner-layout">
+        <div class="camera-panel">
+          <div class="camera-caption"><svg class="icon" aria-hidden="true"><use href="#icon-camera"/></svg><span>Camera preview</span></div>
+          <div class="viewfinder"><video id="video" autoplay playsinline aria-label="Live camera preview for the medication label"></video><span class="viewfinder-guide" aria-hidden="true"></span></div>
+          <canvas id="canvas" class="hidden"></canvas>
+          <div class="buttons"><button class="secondary" onclick="startCamera()"><svg class="icon" aria-hidden="true"><use href="#icon-camera"/></svg>Start camera</button><button onclick="captureLabel()">Capture &amp; analyze <svg class="icon" aria-hidden="true"><use href="#icon-scan"/></svg></button></div>
+          <p class="field-hint">Start the camera, position the label, then capture.</p>
+        </div>
+        <div class="label-upload-panel">
+          <h3>Already have a photo?</h3><p class="muted">Upload an image of the medication label.</p>
+          <div class="upload-field"><label for="labelFile">Label image</label><input id="labelFile" type="file" accept="image/*" capture="environment"></div>
+          <button class="secondary" onclick="analyzeUploadedLabel()">Analyze uploaded label <svg class="icon" aria-hidden="true"><use href="#icon-arrow"/></svg></button>
+          <details><summary>Demo fallback: type visible label text</summary><div class="details-content"><span class="demo-label">DEMO / NOT FOR MEDICAL USE</span><label for="labelText">Visible label text</label><textarea id="labelText" rows="3" placeholder="Metformin 500 mg"></textarea><button class="secondary" onclick="analyzeLabelText()">Analyze demo text</button></div></details>
+        </div>
+      </div>
+      <div id="scanStatus" class="status" role="status" aria-live="polite"></div>
+      <div class="notice scanner-notice"><svg class="icon" aria-hidden="true"><use href="#icon-info"/></svg><p>Gemini reads the visible name and strength. The comparison uses your confirmed prescription information.</p></div>
+      <div class="actions"><button class="secondary" onclick="show('dashboard')">Back to dashboard</button></div>
+    </section>
 
-<section id="result" class="card hidden">
-<div id="resultBox"></div>
-<button onclick="speakResult()">🔊 Read result</button>
-<button onclick="show('scanner')">Scan another label</button>
-<button class="secondary" onclick="show('dashboard')">Dashboard</button>
-</section>
-
-<footer>MedGuide Vision · DEMO / NOT FOR MEDICAL USE</footer>
-</main>
-<script src="/static/app.js"></script>
-</body></html>
+    <section id="result" class="card hidden" aria-labelledby="result-title">
+      <div class="section-heading"><p class="eyebrow">Label comparison</p><h2 id="result-title">Your label check</h2><p>Compared with your stored prescription information.</p></div>
+      <div id="resultBox" role="status" aria-live="polite" aria-atomic="true"></div>
+      <div class="actions section-actions"><button onclick="speakResult()"><svg class="icon" aria-hidden="true"><use href="#icon-voice"/></svg>Read result</button><button class="secondary" onclick="show('scanner')"><svg class="icon" aria-hidden="true"><use href="#icon-scan"/></svg>Scan another label</button><button class="text-button" onclick="show('dashboard')">Dashboard <svg class="icon" aria-hidden="true"><use href="#icon-arrow"/></svg></button></div>
+    </section>
+    <footer class="app-footer"><span>MedGuide Vision <span class="footer-divider" aria-hidden="true">/</span> Built for understanding.</span><span class="demo-label">DEMO / NOT FOR MEDICAL USE</span></footer>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>

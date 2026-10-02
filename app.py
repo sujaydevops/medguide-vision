@@ -18,6 +18,9 @@ DEMO = {
 }
 CURRENT = DEMO.copy()
 
+def demo_mode_enabled():
+    return os.getenv("DEMO_MODE", "").lower() in {"1", "true", "yes"}
+
 def normalize(v):
     return re.sub(r"\s+", " ", (v or "").strip().lower())
 
@@ -93,6 +96,16 @@ Do not give medical advice."""
     if image: parts.append(data_url_part(image))
     if not parts:
         return jsonify({"error":"Provide prescription text or image."}), 400
+    if demo_mode_enabled() and not os.getenv("GEMINI_API_KEY"):
+        return jsonify({
+            "name": DEMO["name"],
+            "strength": DEMO["strength"],
+            "quantity": DEMO["quantity"],
+            "instructions": DEMO["instructions"],
+            "times": DEMO["times"],
+            "follow_up": DEMO["follow_up"],
+            "demo": True
+        })
     try:
         result = gemini_generate(parts, instruction)
         return jsonify(result)

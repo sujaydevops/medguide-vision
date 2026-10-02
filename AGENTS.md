@@ -978,3 +978,73 @@ not redesign the whole application unless the team explicitly agrees.
 > **Build the smallest reliable demo that proves Gemini can make
 > existing prescription information easier to understand and verify
 > without ever becoming the prescriber.**
+
+
+# AGENTS.md
+
+## Frontend Design Guidelines
+
+When creating or modifying frontend UI, prioritize distinctive, polished,
+production-quality design rather than generic AI-generated aesthetics.
+
+### Typography
+- Choose typography that gives the product a distinct identity.
+- Avoid automatically defaulting to generic fonts such as Arial, Roboto,
+  Inter, or system fonts unless they are already part of the project's
+  design system.
+- Maintain clear hierarchy between headings, body text, labels, and metadata.
+
+### Color
+- Use a cohesive visual direction.
+- Define reusable colors with CSS variables or the project's existing
+  design-token system.
+- Use accent colors intentionally.
+- Avoid generic purple-gradient-on-white "AI SaaS" aesthetics.
+
+### Layout
+- Create deliberate visual hierarchy.
+- Use spacing intentionally.
+- Avoid making every section a floating rounded card.
+- Don't default to predictable dashboard/component arrangements when a
+  stronger composition would work.
+
+### Backgrounds and Depth
+- Avoid flat, empty-looking interfaces when depth would improve the design.
+- Consider subtle gradients, patterns, borders, shadows, textures, and
+  layered elements where appropriate.
+- Effects should support the product's visual identity rather than being
+  decorative noise.
+
+### Motion
+- Use motion intentionally.
+- Prefer a few polished transitions or interactions over excessive animation.
+- Use the project's existing animation tools when available.
+- Do not add animation libraries unless necessary.
+
+### Avoid Generic AI Aesthetics
+Avoid:
+- excessive rounded cards
+- excessive pills
+- unnecessary glassmorphism
+- purple gradients by default
+- repetitive card grids
+- generic hero sections
+- random gradients
+- excessive glow effects
+- visually interchangeable SaaS designs
+
+The interface should feel designed specifically for this product.
+
+## Working With Existing UI
+
+Before making visual changes:
+
+1. Inspect the existing application and design system.
+2. Identify reusable components, tokens, and styling conventions.
+3. Preserve existing functionality.
+4. Preserve responsive behavior.
+5. Reuse existing components where appropriate.
+6. Do not introduce dependencies unless necessary.
+7. Do not rewrite unrelated code purely for aesthetics.
+8. Make changes consistent across the application rather than adding
+   isolated one-off styles.

@@ -3,3 +3,14 @@ __pycache__/
 *.pyc
 .env
 .DS_Store
+.agents/skills
+.agents/skills/*
+.gitignore
+.venv-1
+FRONTEND_DESIGN.md
+Web design 
+.env.example
+app.py
+.venv-1
+.agents
+demo
