@@ -18,6 +18,8 @@ app.config.update(
 )
 
 def database_path():
+    if os.getenv("VERCEL"):
+        return os.getenv("DATABASE_PATH", "/tmp/medguide.sqlite3")
     return app.config.get("DATABASE_PATH") or os.getenv(
         "DATABASE_PATH", str(Path(app.instance_path) / "medguide.sqlite3")
     )
@@ -314,8 +316,12 @@ def current_reminder(user_id):
     return dict(reminder) if reminder else {"status": "not_requested"}
 
 scheduler = BackgroundScheduler(timezone="UTC", daemon=True)
-scheduler.start()
-restore_pending_reminders()
+
+# Vercel functions are short-lived serverless processes.
+# Do not start the background scheduler there.
+if not os.getenv("VERCEL"):
+    scheduler.start()
+    restore_pending_reminders()
 
 def normalize(v):
     return re.sub(r"\s+", " ", (v or "").strip().lower())
