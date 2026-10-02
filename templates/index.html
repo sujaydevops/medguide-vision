@@ -1,473 +1,221 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MedGuide Vision</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
-
 <body>
 <main class="shell">
-
-<header>
-  <div class="brand">✦ MedGuide Vision</div>
-  <span class="badge">Hackathon prototype · Demo only</span>
+<header class="site-header">
+  <a class="brand" href="#home" onclick="show('home');return false;" aria-label="MedGuide Vision home"><span class="brand-mark">✦</span> MedGuide <span>Vision</span></a>
+  <nav class="main-nav" aria-label="Main menu">
+    <a href="#how-it-works" onclick="show('home');document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'});return false;">How it works</a>
+    <a href="#accessibility" onclick="show('home');document.getElementById('accessibility').scrollIntoView({behavior:'smooth'});return false;">Accessibility</a>
+    <button id="dashboardNav" class="nav-link hidden" type="button" onclick="show('dashboard')">My dashboard</button>
+  </nav>
+  <div class="header-actions">
+    <span id="accountEmail" class="account-email hidden"></span>
+    <button id="loginButton" class="login-button" type="button" onclick="openLogin()">Log in <span aria-hidden="true">→</span></button>
+    <button id="logoutButton" class="secondary hidden" type="button" onclick="logout()">Sign out</button>
+  </div>
 </header>
 
-<section id="hero" class="card hero">
-  <h1>Medication information,<br>easier to see, hear & understand.</h1>
-
-  <p>
-    Use Gemini to structure an existing prescription, confirm it,
-    then compare a medication label against the confirmed information.
-  </p>
-
-  <div class="notice">
-    <strong>Important:</strong>
-    This prototype does not prescribe medication or determine whether
-    medicine is safe to take.
+<section id="home" class="home-page">
+  <div class="landing-hero">
+    <div class="hero-copy">
+      <span class="eyebrow hero-eyebrow"><span class="eyebrow-dot"></span> MEDICATION CLARITY, MADE HUMAN</span>
+      <h1>Feel more confident understanding your medication.</h1>
+      <p>Make written prescriptions easier to read, hear, and understand—in the language that feels right to you.</p>
+      <div class="hero-actions">
+        <button class="primary-button" type="button" onclick="openLogin()">Get started <span aria-hidden="true">→</span></button>
+        <button class="quiet-button" type="button" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})"><span class="play-icon" aria-hidden="true">▶</span> See how it works</button>
+      </div>
+      <div class="trust-note"><span aria-hidden="true">✳</span><span>Built for clarity and accessibility.<br><strong>Never a substitute for your pharmacist or clinician.</strong></span></div>
+    </div>
+    <div class="hero-art" aria-label="Illustration of accessible medication information on a phone" role="img">
+      <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+      <div class="art-sparkle sparkle-one">✦</div><div class="art-sparkle sparkle-two">✳</div>
+      <div class="phone-card">
+        <div class="phone-top"><span>YOUR MEDICATION PLAN</span><span class="phone-menu">···</span></div>
+        <div class="med-card">
+          <div class="med-symbol">✳</div>
+          <div><span class="med-label">CONFIRMED PRESCRIPTION</span><strong>Medication details</strong><small>Information from your source</small></div>
+        </div>
+        <div class="phone-line long"></div><div class="phone-line short"></div>
+        <div class="schedule-card"><span class="schedule-icon">◷</span><span><small>SCHEDULE</small><strong>Your confirmed instructions</strong></span><span class="schedule-check">✓</span></div>
+        <div class="listen-card"><span class="listen-icon">⌁</span><span>Listen to an explanation</span><span class="listen-play">▶</span></div>
+      </div>
+      <div class="floating-note"><span class="floating-icon">Aa</span><span><strong>Made to understand</strong><small>Clear · Accessible · Yours</small></span></div>
+      <div class="art-caption">Your information, made easier to follow.</div>
+    </div>
   </div>
 
-  <button onclick="show('setup')">Get started</button>
+  <div id="how-it-works" class="carousel-section">
+    <div class="section-heading">
+      <div><span class="eyebrow">A LITTLE MORE CLARITY, STEP BY STEP</span><h2>From prescription to peace of mind.</h2></div>
+      <p>Your information stays yours. You review it before it becomes your confirmed plan.</p>
+    </div>
+    <div class="carousel" role="region" aria-roledescription="carousel" aria-label="What MedGuide Vision helps you do">
+      <div class="carousel-track" id="carouselTrack">
+        <article class="feature-slide slide-lilac" aria-roledescription="slide" aria-label="1 of 3">
+          <div class="slide-art upload-art" aria-hidden="true">
+            <div class="paper-sheet"><span class="paper-mark">Rx</span><i></i><i></i><i></i><b>Prescription</b><em>Upload or take a photo</em></div>
+            <div class="upload-arrow">↑</div>
+            <div class="scan-orb">✦</div>
+          </div>
+          <div class="slide-copy"><span class="slide-number">01 / READ</span><h3>Start with what you have.</h3><p>Upload or photograph an existing prescription. Gemini helps read what’s actually written—without filling in missing details.</p><span class="slide-tag">YOUR SOURCE, NOT A GUESS</span></div>
+        </article>
+        <article class="feature-slide slide-peach" aria-roledescription="slide" aria-label="2 of 3">
+          <div class="slide-art review-art" aria-hidden="true">
+            <div class="review-window"><div class="review-window-top"><span></span><span></span><span></span></div><div class="review-row"><i>✓</i><span></span></div><div class="review-row"><i>✓</i><span></span></div><div class="review-row"><i>?</i><span></span></div><div class="review-confirm">Your review comes first <b>✓</b></div></div>
+            <div class="review-sticker">YOUR<br>CHOICE</div>
+          </div>
+          <div class="slide-copy"><span class="slide-number">02 / REVIEW</span><h3>You’re in control.</h3><p>Check the extracted details and confirm them yourself. Only the information you review can become your saved medication plan.</p><span class="slide-tag">REVIEW BEFORE SAVING</span></div>
+        </article>
+        <article class="feature-slide slide-mint" aria-roledescription="slide" aria-label="3 of 3">
+          <div class="slide-art verify-art" aria-hidden="true">
+            <div class="label-bottle"><div class="bottle-cap"></div><div class="bottle-label"><span>LABEL CHECK</span><b>Read the<br>visible label</b><i>Compare details</i></div></div>
+            <div class="scan-ring"><span>✦</span></div><div class="verify-chip"><b>✓</b><span>Compare with<br>your saved details</span></div>
+          </div>
+          <div class="slide-copy"><span class="slide-number">03 / UNDERSTAND</span><h3>Make it easier to follow.</h3><p>Hear an explanation in your selected language, and compare a medication label with your confirmed prescription information.</p><span class="slide-tag">CLEAR, ACCESSIBLE INFORMATION</span></div>
+        </article>
+      </div>
+      <div class="carousel-controls">
+        <div class="carousel-dots" role="group" aria-label="Choose a carousel slide">
+          <button class="carousel-dot active" type="button" aria-label="Show slide 1" aria-current="true" onclick="goToSlide(0)"></button>
+          <button class="carousel-dot" type="button" aria-label="Show slide 2" onclick="goToSlide(1)"></button>
+          <button class="carousel-dot" type="button" aria-label="Show slide 3" onclick="goToSlide(2)"></button>
+        </div>
+        <div class="carousel-arrows"><button type="button" aria-label="Previous slide" onclick="moveCarousel(-1)">←</button><button type="button" aria-label="Next slide" onclick="moveCarousel(1)">→</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="accessibility" class="accessibility-band">
+    <span class="accessibility-icon" aria-hidden="true">Aa</span>
+    <div><span class="eyebrow">DESIGNED AROUND YOU</span><h2>Information you can read, hear, and understand.</h2><p>Choose a language, use voice playback, and keep the original confirmed information close. Missing details stay missing.</p></div>
+    <button class="secondary" type="button" onclick="openLogin()">Explore your dashboard <span aria-hidden="true">→</span></button>
+  </div>
+  <div class="safety-note"><span aria-hidden="true">✳</span><p><strong>Important:</strong> MedGuide Vision helps explain information that is already on a prescription. It does not prescribe, recommend a dose, diagnose, or decide whether a medication is safe to take. For questions, speak with your pharmacist or clinician.</p></div>
 </section>
 
+<section id="auth" class="card auth-card hidden">
+<button type="button" class="back-link" onclick="show('home')">← Back to home</button>
+<span class="eyebrow">YOUR MEDGUIDE ACCOUNT</span>
+<h1 id="authTitle">Welcome back</h1>
+<p class="muted">Sign in or create an account to continue to your dashboard.</p>
+<form id="authForm">
+<label>Email address<input id="authEmail" type="email" autocomplete="email" required maxlength="254"></label>
+<label>Password<input id="authPassword" type="password" autocomplete="current-password" required minlength="8" maxlength="1024"></label>
+<button id="authSubmit" type="submit">Sign in</button>
+</form>
+<p id="authStatus" class="status" role="status" aria-live="polite"></p>
+<button id="authModeToggle" class="text-button" type="button" onclick="toggleAuthMode()">New here? Create an account</button>
+<div class="notice"><strong>Privacy note:</strong> Use demo information only. This prototype is not for storing real patient data.</div>
+</section>
 
 <section id="setup" class="card hidden">
-
 <h2>1 · Choose language</h2>
-
-<label for="language"><strong>Preferred language</strong></label>
-
-<select id="language">
-<option value="English">English</option>
-<option value="Nepali">नेपाली — Nepali</option>
-<option value="Hindi">हिन्दी — Hindi</option>
-<option value="Spanish">Español — Spanish</option>
-<option value="Chinese Simplified">简体中文 — Chinese (Simplified)</option>
-<option value="Chinese Traditional">繁體中文 — Chinese (Traditional)</option>
-<option value="Arabic">العربية — Arabic</option>
-<option value="Bengali">বাংলা — Bengali</option>
-<option value="Portuguese">Português — Portuguese</option>
-<option value="Russian">Русский — Russian</option>
-<option value="Japanese">日本語 — Japanese</option>
-<option value="Punjabi">ਪੰਜਾਬੀ — Punjabi</option>
-<option value="German">Deutsch — German</option>
-<option value="French">Français — French</option>
-<option value="Urdu">اردو — Urdu</option>
-<option value="Indonesian">Bahasa Indonesia — Indonesian</option>
-<option value="Italian">Italiano — Italian</option>
-<option value="Marathi">मराठी — Marathi</option>
-<option value="Telugu">తెలుగు — Telugu</option>
-<option value="Turkish">Türkçe — Turkish</option>
-<option value="Tamil">தமிழ் — Tamil</option>
-<option value="Vietnamese">Tiếng Việt — Vietnamese</option>
-<option value="Korean">한국어 — Korean</option>
-<option value="Persian">فارسی — Persian</option>
-<option value="Gujarati">ગુજરાતી — Gujarati</option>
-<option value="Polish">Polski — Polish</option>
-<option value="Ukrainian">Українська — Ukrainian</option>
-<option value="Malayalam">മലയാളം — Malayalam</option>
-<option value="Kannada">ಕನ್ನಡ — Kannada</option>
-<option value="Odia">ଓଡ଼ିଆ — Odia</option>
-<option value="Burmese">မြန်မာ — Burmese</option>
-<option value="Thai">ไทย — Thai</option>
-<option value="Dutch">Nederlands — Dutch</option>
-<option value="Greek">Ελληνικά — Greek</option>
-<option value="Romanian">Română — Romanian</option>
-<option value="Czech">Čeština — Czech</option>
-<option value="Hungarian">Magyar — Hungarian</option>
-<option value="Swedish">Svenska — Swedish</option>
-<option value="Danish">Dansk — Danish</option>
-<option value="Finnish">Suomi — Finnish</option>
-<option value="Norwegian">Norsk — Norwegian</option>
-<option value="Hebrew">עברית — Hebrew</option>
-<option value="Malay">Bahasa Melayu — Malay</option>
-<option value="Filipino">Filipino</option>
-<option value="Swahili">Kiswahili — Swahili</option>
-<option value="Afrikaans">Afrikaans</option>
-<option value="Amharic">አማርኛ — Amharic</option>
-<option value="Albanian">Shqip — Albanian</option>
-<option value="Armenian">Հայերեն — Armenian</option>
-<option value="Azerbaijani">Azərbaycanca — Azerbaijani</option>
-<option value="Basque">Euskara — Basque</option>
-<option value="Belarusian">Беларуская — Belarusian</option>
-<option value="Bosnian">Bosanski — Bosnian</option>
-<option value="Bulgarian">Български — Bulgarian</option>
-<option value="Catalan">Català — Catalan</option>
-<option value="Croatian">Hrvatski — Croatian</option>
-<option value="Estonian">Eesti — Estonian</option>
-<option value="Georgian">ქართული — Georgian</option>
-<option value="Haitian Creole">Kreyòl Ayisyen — Haitian Creole</option>
-<option value="Hausa">Hausa</option>
-<option value="Icelandic">Íslenska — Icelandic</option>
-<option value="Irish">Gaeilge — Irish</option>
-<option value="Javanese">Basa Jawa — Javanese</option>
-<option value="Kazakh">Қазақша — Kazakh</option>
-<option value="Khmer">ខ្មែរ — Khmer</option>
-<option value="Kyrgyz">Кыргызча — Kyrgyz</option>
-<option value="Lao">ລາວ — Lao</option>
-<option value="Latvian">Latviešu — Latvian</option>
-<option value="Lithuanian">Lietuvių — Lithuanian</option>
-<option value="Macedonian">Македонски — Macedonian</option>
-<option value="Malagasy">Malagasy</option>
-<option value="Maltese">Malti — Maltese</option>
-<option value="Mongolian">Монгол — Mongolian</option>
-<option value="Pashto">پښتو — Pashto</option>
-<option value="Serbian">Српски — Serbian</option>
-<option value="Sinhala">සිංහල — Sinhala</option>
-<option value="Slovak">Slovenčina — Slovak</option>
-<option value="Slovenian">Slovenščina — Slovenian</option>
-<option value="Somali">Soomaali — Somali</option>
-<option value="Sundanese">Basa Sunda — Sundanese</option>
-<option value="Tajik">Тоҷикӣ — Tajik</option>
-<option value="Uzbek">Oʻzbek — Uzbek</option>
-<option value="Welsh">Cymraeg — Welsh</option>
-<option value="Yoruba">Yorùbá — Yoruba</option>
-<option value="Zulu">isiZulu — Zulu</option>
-<option value="Igbo">Igbo</option>
-<option value="Galician">Galego — Galician</option>
-<option value="Esperanto">Esperanto</option>
-<option value="Latin">Latina — Latin</option>
-<option value="Luxembourgish">Lëtzebuergesch — Luxembourgish</option>
-<option value="Maori">Māori</option>
-<option value="Samoan">Gagana Samoa — Samoan</option>
-<option value="Scots Gaelic">Gàidhlig — Scots Gaelic</option>
-<option value="Shona">Shona</option>
-<option value="Sindhi">سنڌي — Sindhi</option>
-<option value="Sesotho">Sesotho</option>
-<option value="Turkmen">Türkmençe — Turkmen</option>
-<option value="Uyghur">ئۇيغۇرچە — Uyghur</option>
-<option value="Xhosa">isiXhosa — Xhosa</option>
-<option value="Kurdish">Kurdî — Kurdish</option>
-</select>
-
-
+<select id="language" aria-label="Preferred language"></select>
 <h2>2 · Add prescription</h2>
-
-<p class="muted">
-For the demo, paste prescription text or upload/take a photo.
-</p>
-
+<p class="muted">Use the sample details to continue without Gemini, or upload a prescription and analyze it with Gemini.</p>
 <textarea id="rxText" rows="6">DEMO PRESCRIPTION
 Metformin 500 mg
 Take 1 tablet at 8 AM and 1 tablet at 8 PM.
 Follow-up: October 20, 2026</textarea>
-
-<input
-  id="rxFile"
-  type="file"
-  accept="image/*"
-  capture="environment">
-
-<button onclick="analyzeRx()">
-✨ Analyze with Gemini
-</button>
-
-<div id="rxStatus" class="status"></div>
-
+<input id="rxFile" type="file" accept="image/*" capture="environment">
+<button onclick="continueWithDemoPrescription()">Continue with demo prescription (skip Gemini)</button>
+<button class="secondary" onclick="analyzeRx()">Analyze uploaded prescription with Gemini</button>
+<div id="rxStatus" class="status" role="status" aria-live="polite"></div>
 </section>
-
 
 <section id="review" class="card hidden">
-
-<h2>Review before saving</h2>
-
-<p>
-Gemini detected the following. Edit anything that is incorrect before confirming.
-</p>
-
+<h2 id="reviewTitle">Review before saving</h2>
+<p id="reviewDescription">Review and edit these details before confirming.</p>
 <div class="grid">
-
-<label>
-Medicine
-<input id="rName">
-</label>
-
-<label>
-Strength
-<input id="rStrength">
-</label>
-
-<label>
-Quantity
-<input id="rQuantity">
-</label>
-
-<label>
-Times
-<input id="rTimes">
-</label>
-
-<label class="wide">
-Instructions
-<textarea id="rInstructions"></textarea>
-</label>
-
-<label>
-Follow-up
-<input id="rFollow">
-</label>
-
+<label>Medicine<input id="rName"></label>
+<label>Strength<input id="rStrength"></label>
+<label>Quantity<input id="rQuantity"></label>
+<label>Times<input id="rTimes"></label>
+<label class="wide">Instructions<textarea id="rInstructions"></textarea></label>
+<label>Follow-up date<input id="rFollow" type="date"></label>
 </div>
-
-<button onclick="confirmRx()">
-Confirm prescription
-</button>
-
-<button class="secondary" onclick="show('setup')">
-Back
-</button>
-
+<div class="reminder-options">
+<label class="reminder-consent"><input id="reminderConsent" type="checkbox" onchange="toggleReminderSettings()"> I agree to receive one SMS reminder for this follow-up</label>
+<div id="reminderSettings" class="reminder-settings hidden">
+<p>We’ll text you one day before this follow-up at the time you choose. The text includes the written prescription instructions above. Carrier messaging rates may apply.</p>
+<label>Mobile number (international format)<input id="reminderPhone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+14155550123"></label>
+<label>Reminder time in your local timezone<input id="reminderTime" type="time"></label>
+<input id="reminderTimezone" type="hidden">
+<small id="reminderTimezoneLabel"></small>
+<p class="reminder-privacy">SMS may be visible to anyone with access to your phone. This prototype is for demo data only; don’t enter real patient information.</p>
+</div>
+</div>
+<button onclick="confirmRx()">Confirm prescription</button>
+<div id="confirmStatus" class="status" role="status" aria-live="polite"></div>
+<button class="secondary" onclick="show('setup')">Back</button>
 </section>
-
 
 <section id="dashboard" class="card hidden">
+<button class="back-link" type="button" onclick="show('home')">← Back to home</button>
 
-<div class="row">
-
-<div>
-<span class="eyebrow">CONFIRMED PRESCRIPTION</span>
-<h2 id="dName">—</h2>
-<div class="strength" id="dStrength">—</div>
+<div id="dashboardEmpty" class="empty-state hidden">
+<span class="eyebrow">YOUR DASHBOARD</span>
+<h2>No confirmed prescription yet</h2>
+<p>Add a prescription to review and confirm its details. Only then will it appear here.</p>
+<button onclick="show('setup')">Add a prescription</button>
 </div>
-
-<button class="voice" onclick="speakCurrent()">
-🔊 Read aloud
-</button>
-
-</div>
-
+<div id="dashboardRecord">
+<div class="row"><div><span class="eyebrow">CONFIRMED PRESCRIPTION</span><h2 id="dName">—</h2><div class="strength" id="dStrength">—</div></div><button class="voice" onclick="speakCurrent()">🔊 Read aloud</button></div>
 <p id="dInstructions"></p>
-
-<div class="timebox">
-Scheduled times:
-<strong id="dTimes">—</strong>
-</div>
-
+<div class="timebox">Scheduled times: <strong id="dTimes">—</strong></div>
 <p id="dFollow"></p>
-
-
-<div style="margin-top:20px">
-
-<label for="dashboardLanguage">
-<strong>🌎 Explain this information in:</strong>
-</label>
-
-<select
-id="dashboardLanguage"
-onchange="document.getElementById('language').value=this.value">
-
-<option value="English">English</option>
-<option value="Nepali">नेपाली — Nepali</option>
-<option value="Hindi">हिन्दी — Hindi</option>
-<option value="Spanish">Español — Spanish</option>
-<option value="Chinese Simplified">简体中文 — Chinese</option>
-<option value="Arabic">العربية — Arabic</option>
-<option value="Bengali">বাংলা — Bengali</option>
-<option value="Portuguese">Português — Portuguese</option>
-<option value="Russian">Русский — Russian</option>
-<option value="Japanese">日本語 — Japanese</option>
-<option value="Punjabi">ਪੰਜਾਬੀ — Punjabi</option>
-<option value="German">Deutsch — German</option>
-<option value="French">Français — French</option>
-<option value="Urdu">اردو — Urdu</option>
-<option value="Italian">Italiano — Italian</option>
-<option value="Tamil">தமிழ் — Tamil</option>
-<option value="Telugu">తెలుగు — Telugu</option>
-<option value="Vietnamese">Tiếng Việt — Vietnamese</option>
-<option value="Korean">한국어 — Korean</option>
-<option value="Thai">ไทย — Thai</option>
-<option value="Greek">Ελληνικά — Greek</option>
-<option value="Hebrew">עברית — Hebrew</option>
-<option value="Swahili">Kiswahili — Swahili</option>
-<option value="Somali">Soomaali — Somali</option>
-<option value="Amharic">አማርኛ — Amharic</option>
-<option value="Persian">فارسی — Persian</option>
-<option value="Gujarati">ગુજરાતી — Gujarati</option>
-<option value="Marathi">मराठी — Marathi</option>
-<option value="Malayalam">മലയാളം — Malayalam</option>
-<option value="Kannada">ಕನ್ನಡ — Kannada</option>
-<option value="Sinhala">සිංහල — Sinhala</option>
-<option value="Burmese">မြန်မာ — Burmese</option>
-<option value="Indonesian">Bahasa Indonesia — Indonesian</option>
-<option value="Malay">Bahasa Melayu — Malay</option>
-<option value="Filipino">Filipino</option>
-<option value="Dutch">Nederlands — Dutch</option>
-<option value="Polish">Polski — Polish</option>
-<option value="Ukrainian">Українська — Ukrainian</option>
-<option value="Romanian">Română — Romanian</option>
-<option value="Turkish">Türkçe — Turkish</option>
-<option value="Czech">Čeština — Czech</option>
-<option value="Hungarian">Magyar — Hungarian</option>
-<option value="Swedish">Svenska — Swedish</option>
-<option value="Danish">Dansk — Danish</option>
-<option value="Finnish">Suomi — Finnish</option>
-<option value="Norwegian">Norsk — Norwegian</option>
-<option value="Afrikaans">Afrikaans</option>
-<option value="Albanian">Shqip — Albanian</option>
-<option value="Armenian">Հայերեն — Armenian</option>
-<option value="Azerbaijani">Azərbaycanca — Azerbaijani</option>
-<option value="Basque">Euskara — Basque</option>
-<option value="Belarusian">Беларуская — Belarusian</option>
-<option value="Bosnian">Bosanski — Bosnian</option>
-<option value="Bulgarian">Български — Bulgarian</option>
-<option value="Catalan">Català — Catalan</option>
-<option value="Croatian">Hrvatski — Croatian</option>
-<option value="Estonian">Eesti — Estonian</option>
-<option value="Georgian">ქართული — Georgian</option>
-<option value="Haitian Creole">Kreyòl Ayisyen</option>
-<option value="Hausa">Hausa</option>
-<option value="Icelandic">Íslenska — Icelandic</option>
-<option value="Irish">Gaeilge — Irish</option>
-<option value="Javanese">Basa Jawa — Javanese</option>
-<option value="Kazakh">Қазақша — Kazakh</option>
-<option value="Khmer">ខ្មែរ — Khmer</option>
-<option value="Kyrgyz">Кыргызча — Kyrgyz</option>
-<option value="Lao">ລາວ — Lao</option>
-<option value="Latvian">Latviešu — Latvian</option>
-<option value="Lithuanian">Lietuvių — Lithuanian</option>
-<option value="Macedonian">Македонски — Macedonian</option>
-<option value="Malagasy">Malagasy</option>
-<option value="Maltese">Malti — Maltese</option>
-<option value="Mongolian">Монгол — Mongolian</option>
-<option value="Pashto">پښتو — Pashto</option>
-<option value="Serbian">Српски — Serbian</option>
-<option value="Slovak">Slovenčina — Slovak</option>
-<option value="Slovenian">Slovenščina — Slovenian</option>
-<option value="Sundanese">Basa Sunda — Sundanese</option>
-<option value="Tajik">Тоҷикӣ — Tajik</option>
-<option value="Uzbek">Oʻzbek — Uzbek</option>
-<option value="Welsh">Cymraeg — Welsh</option>
-<option value="Yoruba">Yorùbá — Yoruba</option>
-<option value="Zulu">isiZulu — Zulu</option>
-<option value="Igbo">Igbo</option>
-<option value="Galician">Galego — Galician</option>
-<option value="Esperanto">Esperanto</option>
-<option value="Latin">Latina — Latin</option>
-<option value="Luxembourgish">Lëtzebuergesch</option>
-<option value="Maori">Māori</option>
-<option value="Samoan">Gagana Samoa — Samoan</option>
-<option value="Scots Gaelic">Gàidhlig — Scots Gaelic</option>
-<option value="Shona">Shona</option>
-<option value="Sindhi">سنڌي — Sindhi</option>
-<option value="Sesotho">Sesotho</option>
-<option value="Turkmen">Türkmençe — Turkmen</option>
-<option value="Uyghur">ئۇيغۇرچە — Uyghur</option>
-<option value="Xhosa">isiXhosa — Xhosa</option>
-<option value="Kurdish">Kurdî — Kurdish</option>
-
-</select>
-
+<p id="dReminder" class="reminder-status" role="status" aria-live="polite"></p>
+<div class="dashboard-language">
+<label for="dashboardLanguage"><strong>Explanation language</strong></label>
+<select id="dashboardLanguage" aria-label="Explanation language"></select>
 </div>
 
+<div id="translation" role="status" aria-live="polite"></div>
 
-<div id="translation"></div>
-
-<button onclick="translateCurrent()">
-🌎 Explain in selected language
-</button>
-
-<button onclick="show('scanner')">
-📷 Check my medication label
-</button>
-
+<button onclick="translateCurrent()">🌎 Explain in selected language</button>
+<button onclick="show('scanner')">📷 Check my medication label</button>
+</div>
 </section>
-
 
 <section id="scanner" class="card hidden">
-
 <h2>Check medication label</h2>
-
-<p>
-Point the camera at the pharmacy/demo label.
-Gemini reads the visible name and strength;
-deterministic code performs the comparison.
-</p>
-
+<p>Point the camera at the pharmacy/demo label. Gemini reads the visible name and strength; deterministic code performs the comparison.</p>
 <video id="video" autoplay playsinline></video>
 <canvas id="canvas" class="hidden"></canvas>
-
 <div class="buttons">
-
-<button onclick="startCamera()">
-Start camera
-</button>
-
-<button onclick="captureLabel()">
-Capture & analyze
-</button>
-
+<button id="startCameraButton" onclick="startCamera()">Start camera</button>
+<button id="captureLabelButton" onclick="captureLabel()">Capture & analyze</button>
 </div>
-
 <p class="or">or upload a label image</p>
-
-<input
-id="labelFile"
-type="file"
-accept="image/*"
-capture="environment">
-
-<button onclick="analyzeUploadedLabel()">
-Analyze uploaded label
-</button>
-
-<details>
-
-<summary>
-Demo fallback: type visible label text
-</summary>
-
-<textarea
-id="labelText"
-rows="3"
-placeholder="Metformin 500 mg"></textarea>
-
-<button onclick="analyzeLabelText()">
-Analyze demo text
-</button>
-
-</details>
-
-<div id="scanStatus" class="status"></div>
-
-<button
-class="secondary"
-onclick="show('dashboard')">
-Back to dashboard
-</button>
-
+<input id="labelFile" type="file" accept="image/*" capture="environment">
+<button onclick="analyzeUploadedLabel()">Analyze uploaded label</button>
+<div id="manualLabelEntry" class="manual-label hidden">
+<div id="manualImagePreview" class="manual-image-preview hidden"><img id="capturedLabelImage" alt="Captured medication label for manual review"></div>
+<h3>Enter the visible label details</h3>
+<p id="manualLabelReason" class="muted">Gemini analysis is unavailable. Read the label and enter only what is clearly visible. Do not guess missing information.</p>
+<label>Medication name<input id="manualLabelName" autocomplete="off" placeholder="Enter the name as printed"></label>
+<label>Strength<input id="manualLabelStrength" autocomplete="off" placeholder="Leave blank if not visible"></label>
+<button type="button" onclick="verifyManualLabel()">Compare entered details</button>
+</div>
+<div id="scanStatus" class="status" role="status" aria-live="polite"></div>
+<button class="secondary" onclick="show('dashboard')">Back to dashboard</button>
 </section>
-
 
 <section id="result" class="card hidden">
-
 <div id="resultBox"></div>
-
-<button onclick="speakResult()">
-🔊 Read result
-</button>
-
-<button onclick="show('scanner')">
-Scan another label
-</button>
-
-<button
-class="secondary"
-onclick="show('dashboard')">
-Dashboard
-</button>
-
+<button onclick="speakResult()">🔊 Read result</button>
+<button onclick="show('scanner')">Scan another label</button>
+<button class="secondary" onclick="show('dashboard')">Dashboard</button>
 </section>
 
-
-<footer>
-MedGuide Vision · DEMO / NOT FOR MEDICAL USE
-</footer>
-
+<footer>MedGuide Vision · DEMO / NOT FOR MEDICAL USE</footer>
 </main>
-
 <script src="/static/app.js"></script>
-
-</body>
-</html>
+</body></html>

@@ -237,7 +237,13 @@ Output should follow the shared medication fields.
 
 ### `POST /api/prescription/confirm`
 
-Takes reviewed medication data and persists it as confirmed.
+Takes reviewed medication data and persists it as confirmed. An opt-in reminder request may include a phone number, user-selected local time, and IANA timezone. Never schedule or send a message without explicit consent.
+
+### `GET /api/followups`
+
+Returns the signed-in user's reminder status and, when scheduled, its timestamp/timezone. Never return the phone number from this endpoint.
+
+Follow-up SMS reminders are sent one day before the confirmed follow-up date at the user's selected local time. Include only the follow-up date and written instructions present in the confirmed prescription. If SMS credentials are unavailable, do not send; report that no reminder was scheduled.
 
 ### `GET /api/medications/current`
 
@@ -598,6 +604,12 @@ Before submission, test every row.
 
   Voice unavailable                   UI remains fully usable without
                                       voice
+
+  SMS reminder consent + configured   One SMS one day before; includes
+  Twilio                              confirmed written instructions
+
+  SMS reminder without Twilio config  No SMS sent; dashboard says reminder
+                                      was not scheduled
   -----------------------------------------------------------------------
 
 ------------------------------------------------------------------------
@@ -744,6 +756,7 @@ At minimum:
 -   Language selection/explanation.
 -   Confirmed medication storage.
 -   Dashboard/current medication.
+-   Opt-in follow-up SMS reminder one day before, with written prescription instructions.
 -   Camera or image-based medication label analysis.
 -   Gemini label extraction.
 -   Deterministic match/mismatch.
@@ -754,7 +767,6 @@ At minimum:
 ### SHOULD HAVE
 
 -   Text-to-speech.
--   Follow-up reminder.
 -   History.
 -   Firestore persistence.
 -   Cloud Run deployment.
