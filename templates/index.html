@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MedGuide Vision</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<main class="shell">
+<header><div class="brand">✦ MedGuide Vision</div><span class="badge">Hackathon prototype · Demo only</span></header>
+
+<section id="hero" class="card hero">
+<h1>Medication information,<br>easier to see, hear & understand.</h1>
+<p>Use Gemini to structure an existing prescription, confirm it, then compare a medication label against the confirmed information.</p>
+<div class="notice"><strong>Important:</strong> This prototype does not prescribe medication or determine whether medicine is safe to take.</div>
+<button onclick="show('setup')">Get started</button>
+</section>
+
+<section id="setup" class="card hidden">
+<h2>1 · Choose language</h2>
+<select id="language"><option>English</option><option>Nepali</option><option>Hindi</option><option>Spanish</option><option>Chinese</option></select>
+<h2>2 · Add prescription</h2>
+<p class="muted">For the demo, paste prescription text or upload/take a photo.</p>
+<textarea id="rxText" rows="6">DEMO PRESCRIPTION
+Metformin 500 mg
+Take 1 tablet at 8 AM and 1 tablet at 8 PM.
+Follow-up: October 20, 2026</textarea>
+<input id="rxFile" type="file" accept="image/*" capture="environment">
+<button onclick="analyzeRx()">✨ Analyze with Gemini</button>
+<div id="rxStatus" class="status"></div>
+</section>
+
+<section id="review" class="card hidden">
+<h2>Review before saving</h2>
+<p>Gemini detected the following. Edit anything that is incorrect before confirming.</p>
+<div class="grid">
+<label>Medicine<input id="rName"></label>
+<label>Strength<input id="rStrength"></label>
+<label>Quantity<input id="rQuantity"></label>
+<label>Times<input id="rTimes"></label>
+<label class="wide">Instructions<textarea id="rInstructions"></textarea></label>
+<label>Follow-up<input id="rFollow"></label>
+</div>
+<button onclick="confirmRx()">Confirm prescription</button>
+<button class="secondary" onclick="show('setup')">Back</button>
+</section>
+
+<section id="dashboard" class="card hidden">
+<div class="row"><div><span class="eyebrow">CONFIRMED PRESCRIPTION</span><h2 id="dName">—</h2><div class="strength" id="dStrength">—</div></div><button class="voice" onclick="speakCurrent()">🔊 Read aloud</button></div>
+<p id="dInstructions"></p>
+<div class="timebox">Scheduled times: <strong id="dTimes">—</strong></div>
+<p id="dFollow"></p>
+<div id="translation"></div>
+<button onclick="translateCurrent()">🌎 Explain in selected language</button>
+<button onclick="show('scanner')">📷 Check my medication label</button>
+</section>
+
+<section id="scanner" class="card hidden">
+<h2>Check medication label</h2>
+<p>Point the camera at the pharmacy/demo label. Gemini reads the visible name and strength; deterministic code performs the comparison.</p>
+<video id="video" autoplay playsinline></video>
+<canvas id="canvas" class="hidden"></canvas>
+<div class="buttons">
+<button onclick="startCamera()">Start camera</button>
+<button onclick="captureLabel()">Capture & analyze</button>
+</div>
+<p class="or">or upload a label image</p>
+<input id="labelFile" type="file" accept="image/*" capture="environment">
+<button onclick="analyzeUploadedLabel()">Analyze uploaded label</button>
+<details><summary>Demo fallback: type visible label text</summary>
+<textarea id="labelText" rows="3" placeholder="Metformin 500 mg"></textarea>
+<button onclick="analyzeLabelText()">Analyze demo text</button></details>
+<div id="scanStatus" class="status"></div>
+<button class="secondary" onclick="show('dashboard')">Back to dashboard</button>
+</section>
+
+<section id="result" class="card hidden">
+<div id="resultBox"></div>
+<button onclick="speakResult()">🔊 Read result</button>
+<button onclick="show('scanner')">Scan another label</button>
+<button class="secondary" onclick="show('dashboard')">Dashboard</button>
+</section>
+
+<footer>MedGuide Vision · DEMO / NOT FOR MEDICAL USE</footer>
+</main>
+<script src="/static/app.js"></script>
+</body></html>

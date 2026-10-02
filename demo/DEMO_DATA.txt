@@ -1,0 +1,12 @@
+DEMO / NOT FOR MEDICAL USE
+
+Prescription:
+Metformin 500 mg
+Take 1 tablet at 8 AM and 1 tablet at 8 PM.
+Follow-up: October 20, 2026
+
+Label tests:
+1. Metformin 500 mg -> MATCH
+2. Lisinopril 10 mg -> MEDICINE_MISMATCH
+3. Metformin 1000 mg -> STRENGTH_MISMATCH
+4. A label with missing/unreadable strength -> REVIEW_REQUIRED when medicine name matches expected
