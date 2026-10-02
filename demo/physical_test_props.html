@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MedGuide Vision - Physical Test Props</title>
+  <style>
+    :root {
+      color: #111;
+      font-family: Arial, Helvetica, sans-serif;
+      font-synthesis: none;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #e8e8e8;
+    }
+
+    .sheet {
+      width: 8.5in;
+      min-height: 11in;
+      margin: 0 auto;
+      padding: 0.35in;
+      background: #fff;
+      display: grid;
+      grid-template-rows: 2.75in repeat(3, 2.35in);
+      gap: 0.12in;
+    }
+
+    .prop {
+      border: 2px dashed #222;
+      padding: 0.14in 0.28in;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .eyebrow {
+      margin: 0 0 0.08in;
+      font-size: 14pt;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .warning {
+      margin: 0 0 0.16in;
+      padding: 0.07in 0.12in;
+      border: 2px solid #111;
+      font-size: 16pt;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .prescription .medicine {
+      margin: 0 0 0.12in;
+      font-size: 25pt;
+      font-weight: 800;
+    }
+
+    .prescription .instruction,
+    .prescription .follow-up {
+      margin: 0.05in 0;
+      font-size: 16pt;
+      line-height: 1.2;
+    }
+
+    .bottle .pharmacy {
+      margin: 0 0 0.05in;
+      font-size: 16pt;
+      font-weight: 700;
+    }
+
+    .bottle .medicine {
+      margin: 0;
+      font-size: 25pt;
+      font-weight: 900;
+      line-height: 1.05;
+    }
+
+    .bottle .instruction {
+      margin: 0.08in 0 0;
+      font-size: 16pt;
+      font-weight: 700;
+    }
+
+    .cut-note {
+      position: absolute;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+    }
+
+    @media screen {
+      body::before {
+        content: "Print at 100% scale on US Letter paper, then cut on dashed borders.";
+        display: block;
+        max-width: 8.5in;
+        margin: 0 auto 12px;
+        color: #111;
+        font-weight: 700;
+      }
+    }
+
+    @media print {
+      @page {
+        size: letter portrait;
+        margin: 0;
+      }
+
+      body {
+        padding: 0;
+        background: #fff;
+      }
+
+      .sheet {
+        margin: 0;
+        break-after: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="sheet" aria-label="Four printable medication demonstration props">
+    <section class="prop prescription" aria-labelledby="prop-one">
+      <h1 class="eyebrow" id="prop-one">Prop 1 · Prescription Sheet</h1>
+      <p class="warning">DEMO / NOT FOR MEDICAL USE</p>
+      <p class="medicine">Rx: Metformin 500 mg</p>
+      <p class="instruction">Take 1 tablet twice daily with food</p>
+      <p class="follow-up">Follow-up: Oct 20, 2026</p>
+    </section>
+
+    <section class="prop bottle" aria-labelledby="prop-two">
+      <h2 class="eyebrow" id="prop-two">Prop 2 · Matching Bottle Label</h2>
+      <p class="warning">DEMO / NOT FOR MEDICAL USE</p>
+      <p class="pharmacy">SFSU Pharmacy</p>
+      <p class="medicine">Metformin 500 mg</p>
+      <p class="instruction">Take 1 tablet twice daily</p>
+    </section>
+
+    <section class="prop bottle" aria-labelledby="prop-three">
+      <h2 class="eyebrow" id="prop-three">Prop 3 · Wrong Drug Bottle Label</h2>
+      <p class="warning">DEMO / NOT FOR MEDICAL USE</p>
+      <p class="pharmacy">SFSU Pharmacy</p>
+      <p class="medicine">Lisinopril 10 mg</p>
+      <p class="instruction">Take 1 tablet daily</p>
+    </section>
+
+    <section class="prop bottle" aria-labelledby="prop-four">
+      <h2 class="eyebrow" id="prop-four">Prop 4 · Wrong Strength Trap Label</h2>
+      <p class="warning">DEMO / NOT FOR MEDICAL USE</p>
+      <p class="pharmacy">SFSU Pharmacy</p>
+      <p class="medicine">Metformin 1000 mg</p>
+      <p class="instruction">Take 1 tablet twice daily</p>
+    </section>
+  </main>
+</body>
+</html>

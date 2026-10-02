@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": ["string", "null"],
+      "description": "Medication name only when clearly visible on the supplied label; otherwise null."
+    },
+    "strength": {
+      "type": ["string", "null"],
+      "description": "Medication strength exactly as printed when clearly visible; otherwise null. Do not infer."
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"],
+      "description": "Confidence in reading the visible label text."
+    }
+  },
+  "required": ["name", "strength", "confidence"]
+}
