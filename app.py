@@ -38,9 +38,10 @@ def verify(expected, detected):
 
 def gemini_generate(parts, system_instruction):
     try:
+
         from google import genai
-        client = genai.Client(vertexai=True, project="project-24ac780f-6279-48f7-875", location="global")
-        model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+        model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
         prompt = system_instruction + "\nReturn valid JSON only."
         contents = [prompt] + parts
         resp = client.models.generate_content(model=model, contents=contents)
