@@ -115,7 +115,26 @@ function getLanguageCode(languageName){
 }
 
 const demoPrescription={name:"Metformin",strength:"500 mg",quantity:"1 tablet",instructions:"Take 1 tablet at 8 AM and 1 tablet at 8 PM.",times:["08:00","20:00"],follow_up:"2026-10-20"};
-function show(id){document.querySelectorAll("main>section").forEach(x=>x.classList.add("hidden"));document.getElementById(id).classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});}
+function show(id){
+ if(id!=="scanner" && typeof stopLiveScan==="function"){
+   stopLiveScan(true);
+ }
+
+ document.querySelectorAll("main>section").forEach(
+   x=>x.classList.add("hidden")
+ );
+
+ const target=document.getElementById(id);
+
+ if(target){
+   target.classList.remove("hidden");
+ }
+
+ window.scrollTo({
+   top:0,
+   behavior:"smooth"
+ });
+}
 function openLogin(){
  if(account){show("dashboard");return;}
  authMode="login";authTitle.textContent="Welcome back";authSubmit.textContent="Sign in";authPassword.autocomplete="current-password";authModeToggle.textContent="New here? Create an account";authStatus.textContent="";show("auth");
@@ -223,8 +242,8 @@ function renderReminderStatus(){
 }
 function speak(text, languageName="English"){
  if(!("speechSynthesis" in window)){
-  alert("Text-to-speech is unavailable in this browser.");
-  return;
+   alert("Text-to-speech is unavailable in this browser.");
+   return;
  }
 
  if(!text)return;
@@ -233,16 +252,26 @@ function speak(text, languageName="English"){
 
  const utterance=new SpeechSynthesisUtterance(text);
  const code=getLanguageCode(languageName);
- utterance.lang=code;
 
- const voices=cachedVoices.length ? cachedVoices : speechSynthesis.getVoices();
+ utterance.lang=code;
+ utterance.rate=1.05;
+ utterance.pitch=1;
+ utterance.volume=1;
+
+ const voices=
+   cachedVoices.length
+   ? cachedVoices
+   : speechSynthesis.getVoices();
+
  const prefix=code.toLowerCase().split("-")[0];
 
  const voice=
-  voices.find(v=>v.lang.toLowerCase()===code.toLowerCase()) ||
-  voices.find(v=>v.lang.toLowerCase().startsWith(prefix));
+   voices.find(v=>v.lang.toLowerCase()===code.toLowerCase()) ||
+   voices.find(v=>v.lang.toLowerCase().startsWith(prefix));
 
- if(voice)utterance.voice=voice;
+ if(voice){
+   utterance.voice=voice;
+ }
 
  speechSynthesis.speak(utterance);
 }
@@ -292,6 +321,416 @@ async function startCamera(){
   scanStatus.textContent="Camera ready. Center the label in view, then capture it.";
  }catch(e){scanStatus.textContent="Camera unavailable: "+e.message+" You can upload a photo or enter visible label details below.";showManualLabelEntry();}
 }
+
+
+let liveScanActive = false;
+let liveScanTimer = null;
+let liveScanBusy = false;
+let liveScanAttempts = 0;
+let liveScanFinished = false;
+
+/*
+ * Fast live scanner
+ *
+ * Rules:
+ * 1. Only ONE Gemini request can run at a time.
+ * 2. Once Gemini returns a clear medication OR clear non-medication result,
+ *    scanning stops immediately.
+ * 3. The camera is stopped before showing the result.
+ * 4. Gemini/API errors do NOT create an infinite request loop.
+ * 5. Scan Again starts a completely fresh session.
+ */
+
+const LIVE_SCAN_INTERVAL = 1200;
+const LIVE_MAX_ATTEMPTS = 8;
+
+function clearLiveScanTimer(){
+    if(liveScanTimer){
+        clearTimeout(liveScanTimer);
+        liveScanTimer = null;
+    }
+}
+
+function setLiveStatus(message){
+    const el = document.getElementById("liveScanStatusText");
+    const normal = document.getElementById("scanStatus");
+
+    if(el) el.textContent = message;
+    if(normal) normal.textContent = message;
+}
+
+function setLiveButtons(running){
+    const startButton = document.getElementById("startCameraButton");
+    const stopButton = document.getElementById("stopLiveScanButton");
+
+    if(startButton){
+        startButton.classList.toggle("hidden", running);
+    }
+
+    if(stopButton){
+        stopButton.classList.toggle("hidden", !running);
+    }
+}
+
+function scheduleLiveScan(delay = LIVE_SCAN_INTERVAL){
+    clearLiveScanTimer();
+
+    if(!liveScanActive || liveScanFinished){
+        return;
+    }
+
+    liveScanTimer = setTimeout(runLiveScanFrame, delay);
+}
+
+async function startLiveScan(){
+    if(liveScanActive) return;
+
+    liveScanActive = true;
+    liveScanBusy = false;
+    liveScanFinished = false;
+    liveScanAttempts = 0;
+
+    const overlay = document.getElementById("liveScanOverlay");
+    const liveStatus = document.getElementById("liveScanStatus");
+    const startButton = document.getElementById("startCameraButton");
+    const stopButton = document.getElementById("stopLiveScanButton");
+
+    if(overlay) overlay.classList.remove("hidden");
+    if(liveStatus) liveStatus.classList.remove("hidden");
+
+    setLiveButtons(true);
+
+    try{
+        if(!stream){
+            if(!navigator.mediaDevices?.getUserMedia){
+                throw new Error("Camera access is unavailable in this browser.");
+            }
+
+            stream = await navigator.mediaDevices.getUserMedia({
+                video:{
+                    facingMode:{ideal:"environment"},
+                    width:{ideal:1280},
+                    height:{ideal:720}
+                },
+                audio:false
+            });
+
+            video.srcObject = stream;
+        }
+
+        await video.play();
+
+        setLiveStatus("Camera ready — hold the medication label inside the frame.");
+        scheduleLiveScan(300);
+
+    }catch(e){
+        stopLiveScan(true);
+        setLiveStatus("Camera unavailable: " + e.message);
+        showManualLabelEntry();
+    }
+}
+
+async function runLiveScanFrame(){
+    if(!liveScanActive || liveScanFinished) return;
+
+    if(liveScanBusy){
+        scheduleLiveScan(300);
+        return;
+    }
+
+    if(!video.videoWidth || !video.videoHeight){
+        scheduleLiveScan(500);
+        return;
+    }
+
+    if(liveScanAttempts >= LIVE_MAX_ATTEMPTS){
+        setLiveStatus("I couldn't read the label clearly. Move closer and try again.");
+        stopLiveScan(false);
+        return;
+    }
+
+    liveScanBusy = true;
+    liveScanAttempts++;
+
+    setLiveStatus(
+        liveScanAttempts === 1
+        ? "Reading the label…"
+        : "Still reading the label…"
+    );
+
+    try{
+        /*
+         * Smaller image = faster upload and faster Gemini processing.
+         */
+        const maxWidth = 720;
+        const scale = Math.min(
+            1,
+            maxWidth / video.videoWidth
+        );
+
+        canvas.width = Math.round(video.videoWidth * scale);
+        canvas.height = Math.round(video.videoHeight * scale);
+
+        const ctx = canvas.getContext("2d", {alpha:false});
+
+        ctx.drawImage(
+            video,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        const image = canvas.toDataURL("image/jpeg", .72);
+
+        const detected = await post("/api/label/analyze", {image});
+
+        /*
+         * A clear name means we have enough information to stop.
+         * A non-medication classification also stops.
+         */
+        const name = detected?.name
+            ? String(detected.name).trim()
+            : "";
+
+        const strength = detected?.strength
+            ? String(detected.strength).trim()
+            : "";
+
+        const confidence = detected?.confidence
+            ? String(detected.confidence).toLowerCase()
+            : "";
+
+        const isMedication =
+            detected?.is_medication !== false &&
+            (
+                name.length > 0 ||
+                confidence.includes("high") ||
+                confidence.includes("medium")
+            );
+
+        /*
+         * IMPORTANT:
+         * If Gemini has clearly identified something, STOP.
+         *
+         * This prevents:
+         * "Metformin detected..."
+         * then another scan
+         * then another scan
+         * then another scan.
+         */
+        if(name || detected?.is_medication === false){
+
+            liveScanFinished = true;
+            liveScanActive = false;
+            clearLiveScanTimer();
+
+            if(stream){
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+                video.srcObject = null;
+            }
+
+            setLiveButtons(false);
+
+            /*
+             * Non-medication result
+             */
+            if(detected?.is_medication === false){
+
+                const resultBox = document.getElementById("resultBox");
+
+                if(resultBox){
+                    resultBox.className = "result error";
+
+                    resultBox.innerHTML = `
+                        <h2>⚠ NOT A MEDICATION LABEL</h2>
+                        <p>
+                            The camera detected text, but it does not appear
+                            to be a medication label.
+                        </p>
+                        <hr>
+                        <p>
+                            <strong>Detected</strong><br>
+                            ${name || "Non-medication text"}
+                        </p>
+                    `;
+                }
+
+                lastResultText =
+                    "Not a medication label was detected. " +
+                    "Please show a pharmacy or medication label.";
+
+                show("result");
+                return;
+            }
+
+            /*
+             * Medication detected.
+             * Send it through the existing deterministic comparison.
+             */
+            await verifyDetected({
+                name:name || null,
+                strength:strength || null,
+                confidence:confidence || "detected"
+            });
+
+            return;
+        }
+
+        /*
+         * No useful information yet.
+         * Retry only while the scanner is active.
+         */
+        setLiveStatus("Hold the label steady inside the frame…");
+
+    }catch(e){
+
+        console.error("Live scan error:", e);
+
+        /*
+         * QUOTA / AUTH / SERVER errors should not hammer Gemini.
+         */
+        const message = String(e.message || "");
+
+        if(
+            message.includes("429") ||
+            message.includes("RESOURCE_EXHAUSTED") ||
+            message.includes("quota")
+        ){
+            setLiveStatus(
+                "Gemini is temporarily out of quota. " +
+                "You can upload the label instead."
+            );
+
+            stopLiveScan(false);
+            return;
+        }
+
+        if(e.status === 401){
+            setLiveStatus("Please sign in to continue.");
+            stopLiveScan(false);
+            return;
+        }
+
+        /*
+         * Temporary error:
+         * one controlled retry instead of an endless loop.
+         */
+        setLiveStatus("Couldn't read that frame. Trying once more…");
+
+    }finally{
+        liveScanBusy = false;
+
+        if(
+            liveScanActive &&
+            !liveScanFinished &&
+            liveScanAttempts < LIVE_MAX_ATTEMPTS
+        ){
+            scheduleLiveScan(LIVE_SCAN_INTERVAL);
+        }
+    }
+}
+
+function stopLiveScan(stopCamera = true){
+    liveScanActive = false;
+    liveScanBusy = false;
+    liveScanFinished = true;
+
+    clearLiveScanTimer();
+
+    const overlay = document.getElementById("liveScanOverlay");
+    const liveStatus = document.getElementById("liveScanStatus");
+    const startButton = document.getElementById("startCameraButton");
+    const stopButton = document.getElementById("stopLiveScanButton");
+
+    if(overlay) overlay.classList.add("hidden");
+    if(liveStatus) liveStatus.classList.add("hidden");
+
+    setLiveButtons(false);
+
+    if(stopCamera && stream){
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+
+        if(video){
+            video.srcObject = null;
+        }
+    }
+}
+
+async function startCamera(){
+    /*
+     * Start normal camera preview.
+     */
+    stopLiveScan(true);
+
+    scanStatus.textContent = "Requesting camera access…";
+
+    try{
+        if(!navigator.mediaDevices?.getUserMedia){
+            throw new Error(
+                "Camera access is unavailable. Upload a label photo instead."
+            );
+        }
+
+        stream = await navigator.mediaDevices.getUserMedia({
+            video:{
+                facingMode:{ideal:"environment"},
+                width:{ideal:1280},
+                height:{ideal:720}
+            },
+            audio:false
+        });
+
+        video.srcObject = stream;
+        await video.play();
+
+        scanStatus.textContent =
+            "Camera ready. Hold the label steady and start live scan.";
+
+    }catch(e){
+        scanStatus.textContent =
+            "Camera unavailable: " +
+            e.message +
+            " You can upload a label photo instead.";
+
+        showManualLabelEntry();
+    }
+}
+
+async function captureLabel(){
+    if(!stream){
+        return scanStatus.textContent =
+            "Start the camera first, or upload a label photo.";
+    }
+
+    if(!video.videoWidth || !video.videoHeight){
+        return scanStatus.textContent =
+            "The camera is still starting. Wait for the preview.";
+    }
+
+    const scale = Math.min(
+        1,
+        960 / video.videoWidth
+    );
+
+    canvas.width = Math.round(video.videoWidth * scale);
+    canvas.height = Math.round(video.videoHeight * scale);
+
+    canvas.getContext("2d").drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    await analyzeImage(
+        canvas.toDataURL("image/jpeg", .78)
+    );
+}
+
 async function captureLabel(){
  if(!stream)return scanStatus.textContent="Start the camera first, or upload a label photo.";
  if(!video.videoWidth||!video.videoHeight)return scanStatus.textContent="The camera is still starting. Wait for the preview, then capture again.";
@@ -313,14 +752,59 @@ async function verifyManualLabel(){
 }
 async function analyzeImage(image){
  scanStatus.textContent="Gemini is reading the label…";
- try{const d=await post("/api/label/analyze",{image});await verifyDetected(d);}
- catch(e){
-  scanStatus.textContent=`Gemini label analysis failed: ${e.message}`;
-  manualLabelReason.textContent="Gemini could not read this label. You can still enter the visible details yourself; this will be compared without AI and will not be presented as Gemini analysis.";
-  showManualLabelEntry(image);
+
+ try{
+   const d=await post("/api/label/analyze",{image});
+
+   /*
+    * Manual/upload scans are one-shot.
+    * Never automatically rescan.
+    */
+   await verifyDetected(d);
+
+ }catch(e){
+
+   const msg=String(e.message||"");
+
+   if(
+      msg.includes("429") ||
+      msg.includes("RESOURCE_EXHAUSTED") ||
+      msg.includes("quota")
+   ){
+      scanStatus.textContent=
+        "Gemini is temporarily out of quota. Try again later or use manual entry.";
+      return;
+   }
+
+   scanStatus.textContent=
+      "Gemini could not read this label.";
+
+   manualLabelReason.textContent=
+      "The label could not be read reliably. " +
+      "Enter only details that are clearly visible.";
+
+   showManualLabelEntry(image);
  }
 }
-async function verifyDetected(d){const v=await post("/api/verify",{expected:current,detected:d});const labels={MATCH:["✓ LABEL MATCH","Label matches stored prescription information.","match"],MEDICINE_MISMATCH:["⚠ MEDICATION MISMATCH","The detected medication name does not match the stored prescription.","error"],STRENGTH_MISMATCH:["⚠ STRENGTH MISMATCH","The detected strength does not match the stored prescription.","error"],REVIEW_REQUIRED:["⚠ REVIEW REQUIRED","The strength could not be verified. Check the prescription or pharmacy label.","warn"],UNREADABLE:["⚠ UNABLE TO READ LABEL","Medication information could not be reliably read. Try scanning again.","warn"]};const a=labels[v.status]||labels.UNREADABLE;lastResultText=`${a[0]}. ${a[1]} Expected ${current?.name||"unknown"} ${current?.strength||""}. Detected ${d.name||"unknown"} ${d.strength||"strength unavailable"}.`;resultBox.className="result "+a[2];resultBox.innerHTML=`<h2>${a[0]}</h2><p>${a[1]}</p><hr><p><strong>Expected</strong><br>${current?.name||"—"} · ${current?.strength||"—"}</p><p><strong>Detected</strong><br>${d.name||"—"} · ${d.strength||"—"}</p>`;show("result");}
+async function verifyDetected(d){
+ /*
+  * Any completed verification ends live scanning first.
+  */
+ if(typeof liveScanActive !== "undefined" && liveScanActive){
+    liveScanFinished=true;
+    liveScanActive=false;
+    clearLiveScanTimer();
+
+    if(stream){
+       stream.getTracks().forEach(track=>track.stop());
+       stream=null;
+       if(video)video.srcObject=null;
+    }
+
+    setLiveButtons(false);
+ }
+
+ const v=await post("/api/verify",{expected:current,detected:d});const labels={MATCH:["✓ LABEL MATCH","Label matches stored prescription information.","match"],MEDICINE_MISMATCH:["⚠ MEDICATION MISMATCH","The detected medication name does not match the stored prescription.","error"],STRENGTH_MISMATCH:["⚠ STRENGTH MISMATCH","The detected strength does not match the stored prescription.","error"],REVIEW_REQUIRED:["⚠ REVIEW REQUIRED","The strength could not be verified. Check the prescription or pharmacy label.","warn"],UNREADABLE:["⚠ UNABLE TO READ LABEL","Medication information could not be reliably read. Try scanning again.","warn"]};const a=labels[v.status]||labels.UNREADABLE;lastResultText=`${a[0]}. ${a[1]} Expected ${current?.name||"unknown"} ${current?.strength||""}. Detected ${d.name||"unknown"} ${d.strength||"strength unavailable"}.`;resultBox.className="result "+a[2];resultBox.innerHTML=`<h2>${a[0]}</h2><p>${a[1]}</p><hr><p><strong>Expected</strong><br>${current?.name||"—"} · ${current?.strength||"—"}</p><p><strong>Detected</strong><br>${d.name||"—"} · ${d.strength||"—"}</p>`;show("result");}
 function speakResult(){speak(lastResultText,"English");}
 populateLanguageSelectors();
 initializeApp();

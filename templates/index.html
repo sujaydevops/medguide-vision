@@ -181,17 +181,68 @@ Follow-up: October 20, 2026</textarea>
 
 <button onclick="translateCurrent()">🌎 Explain in selected language</button>
 <button onclick="show('scanner')">📷 Check my medication label</button>
+<button class="secondary" type="button" onclick="show('setup')">➕ Add another prescription</button>
+
 </div>
 </section>
 
 <section id="scanner" class="card hidden">
 <h2>Check medication label</h2>
 <p>Point the camera at the pharmacy/demo label. Gemini reads the visible name and strength; deterministic code performs the comparison.</p>
-<video id="video" autoplay playsinline></video>
+<div class="live-scanner-wrap">
+  <video id="video" autoplay playsinline></video>
+
+  <div id="liveScanOverlay" class="live-scan-overlay hidden">
+    <div class="scan-corners"></div>
+    <div class="scan-line"></div>
+    <div class="live-scan-badge">
+      <span class="live-dot"></span>
+      LIVE MEDICATION SCANNER
+    </div>
+    <div id="liveScanHint" class="live-scan-hint">
+      Hold the medication label inside the frame
+    </div>
+  </div>
+</div>
+
 <canvas id="canvas" class="hidden"></canvas>
+
+<div id="liveScanStatus" class="live-scan-status hidden" role="status" aria-live="polite">
+  <span class="scan-spinner"></span>
+  <span id="liveScanStatusText">Looking for medication label…</span>
+</div>
+
+<div id="liveDetectionPanel" class="live-detection-panel hidden" aria-live="polite">
+  <div class="live-detection-heading">
+    <span class="live-eye">✦</span>
+    <span>LIVE DETECTION</span>
+  </div>
+
+  <div class="live-detection-grid">
+    <div>
+      <span class="live-field-label">MEDICATION</span>
+      <strong id="liveDetectedName">Looking…</strong>
+    </div>
+
+    <div>
+      <span class="live-field-label">STRENGTH</span>
+      <strong id="liveDetectedStrength">Looking…</strong>
+    </div>
+  </div>
+
+  <div id="liveVerificationResult" class="live-verification waiting">
+    Hold the medication label steady inside the frame.
+  </div>
+
+  <div class="live-expected">
+    Expected:
+    <strong id="liveExpectedMedication">—</strong>
+  </div>
+</div>
 <div class="buttons">
-<button id="startCameraButton" onclick="startCamera()">Start camera</button>
-<button id="captureLabelButton" onclick="captureLabel()">Capture & analyze</button>
+<button id="startCameraButton" onclick="startLiveScan()">▶ Start live scan</button>
+<button id="stopLiveScanButton" class="secondary hidden" onclick="stopLiveScan()">■ Stop live scan</button>
+<button id="captureLabelButton" class="secondary" onclick="captureLabel()">Capture manually</button>
 </div>
 <p class="or">or upload a label image</p>
 <input id="labelFile" type="file" accept="image/*" capture="environment">
