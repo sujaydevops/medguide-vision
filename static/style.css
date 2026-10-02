@@ -239,3 +239,305 @@ footer { padding: 22px 0 26px; color: #858995; font-size: 11px; text-align: cent
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+
+
+/* ===== MedGuide Vision Live Medication Scanner ===== */
+
+.live-scanner-wrap {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  border-radius: 22px;
+  background: #111;
+}
+
+.live-scanner-wrap video {
+  display: block;
+  width: 100%;
+  max-height: 520px;
+  object-fit: cover;
+}
+
+.live-scan-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      rgba(0,0,0,.16),
+      rgba(0,0,0,.05),
+      rgba(0,0,0,.16)
+    );
+}
+
+.scan-corners {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 15%;
+  bottom: 15%;
+  border: 2px solid rgba(255,255,255,.72);
+  border-radius: 20px;
+  box-shadow:
+    0 0 0 9999px rgba(0,0,0,.20),
+    0 0 25px rgba(107,92,231,.20);
+}
+
+.scan-corners::before,
+.scan-corners::after {
+  content: "";
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  border-color: #ffffff;
+}
+
+.scan-corners::before {
+  left: -3px;
+  top: -3px;
+  border-left: 5px solid;
+  border-top: 5px solid;
+  border-radius: 16px 0 0 0;
+}
+
+.scan-corners::after {
+  right: -3px;
+  bottom: -3px;
+  border-right: 5px solid;
+  border-bottom: 5px solid;
+  border-radius: 0 0 16px 0;
+}
+
+.scan-line {
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  height: 3px;
+  top: 25%;
+  border-radius: 999px;
+  background: rgba(255,255,255,.95);
+  box-shadow:
+    0 0 12px rgba(107,92,231,.95),
+    0 0 24px rgba(107,92,231,.65);
+  animation: medguideScanLine 2.1s ease-in-out infinite;
+}
+
+@keyframes medguideScanLine {
+  0%, 100% { top: 23%; opacity: .65; }
+  50% { top: 74%; opacity: 1; }
+}
+
+.live-scan-badge {
+  position: absolute;
+  left: 50%;
+  top: 22px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  background: rgba(20,24,36,.84);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+
+.live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ff4d5e;
+  box-shadow: 0 0 0 5px rgba(255,77,94,.16);
+  animation: livePulse 1.2s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  50% {
+    opacity: .45;
+    transform: scale(.8);
+  }
+}
+
+.live-scan-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 86%;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(20,24,36,.82);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.live-scan-status {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 15px 0;
+  padding: 14px 17px;
+  border-radius: 14px;
+  background: #f1efff;
+  color: #29243d;
+  font-weight: 600;
+}
+
+.scan-spinner {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border: 2px solid rgba(107,92,231,.22);
+  border-top-color: #6b5ce7;
+  border-radius: 50%;
+  animation: medguideSpinner .8s linear infinite;
+}
+
+@keyframes medguideSpinner {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 700px) {
+  .scan-corners {
+    left: 7%;
+    right: 7%;
+    top: 12%;
+    bottom: 12%;
+  }
+
+  .live-scan-badge {
+    top: 14px;
+    font-size: 10px;
+  }
+
+  .live-scan-hint {
+    bottom: 14px;
+    font-size: 11px;
+  }
+}
+
+
+
+/* ===== Live Detection Results ===== */
+
+.live-detection-panel {
+  margin: 16px 0 20px;
+  padding: 20px;
+  border: 1px solid #e8e5f2;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(32,38,56,.06);
+}
+
+.live-detection-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 17px;
+  color: #6b5ce7;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .11em;
+}
+
+.live-eye {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #eeebff;
+}
+
+.live-detection-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.live-detection-grid > div {
+  padding: 15px;
+  border-radius: 14px;
+  background: #faf9ff;
+  border: 1px solid #efedf7;
+}
+
+.live-field-label {
+  display: block;
+  margin-bottom: 6px;
+  color: #7b8090;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.live-detection-grid strong {
+  display: block;
+  color: #202638;
+  font-size: 18px;
+}
+
+.live-verification {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 15px 17px;
+  border-radius: 14px;
+  font-size: 13px;
+}
+
+.live-verification strong {
+  font-size: 15px;
+}
+
+.live-verification.waiting {
+  background: #f5f4f8;
+  color: #5f6472;
+}
+
+.live-verification.match {
+  background: #e9f8ef;
+  color: #17653e;
+  border: 1px solid #bde7cc;
+}
+
+.live-verification.mismatch {
+  background: #fff0f0;
+  color: #9a3030;
+  border: 1px solid #f1c4c4;
+}
+
+.live-verification.review {
+  background: #fff7df;
+  color: #765600;
+  border: 1px solid #eedb9b;
+}
+
+.live-expected {
+  margin-top: 12px;
+  color: #73798a;
+  font-size: 12px;
+}
+
+.live-expected strong {
+  color: #202638;
+}
+
+@media (max-width: 600px) {
+
+  .live-detection-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+

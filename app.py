@@ -336,13 +336,11 @@ def verify(expected, detected):
     return {"status": status, "expected": expected, "detected": detected}
 
 def gemini_generate(parts, system_instruction):
-    key = os.getenv("GEMINI_API_KEY")
-    if not key:
-        raise RuntimeError("GEMINI_API_KEY is not configured.")
     try:
+
         from google import genai
-        client = genai.Client(api_key=key)
-        model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+        model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
         prompt = system_instruction + "\nReturn valid JSON only."
         contents = [prompt] + parts
         resp = client.models.generate_content(model=model, contents=contents)
@@ -514,9 +512,31 @@ def analyze_label():
     body = request.get_json(force=True)
     image = body.get("image")
     text = (body.get("text") or "").strip()
-    instruction = """Read only the visible medication label. Extract medication name and strength only
-when clearly visible. Do not infer missing values. Do not provide medical advice or decide whether a
-medicine should be taken. Return exactly: name, strength, confidence. Use null when unreadable."""
+    instruction = """You are reading a camera image for a medication-label accessibility demo.
+
+Classify the visible object FIRST.
+
+Return ONLY valid JSON with exactly these keys:
+{
+  "is_medication": true or false or null,
+  "name": "string or null",
+  "strength": "string or null",
+  "confidence": "high, medium, low, or null"
+}
+
+Rules:
+- If the visible object is clearly a medication/pharmacy label, set is_medication=true.
+- If it is clearly a non-medication product such as Red Bull, soda, food, shampoo, soap,
+  cosmetics, household products, etc., set is_medication=false.
+- If there is not enough visual information, set is_medication=null.
+- Extract ONLY text that is visibly present.
+- Never invent a medication name.
+- Never invent a strength.
+- Do not provide medical advice.
+- Do not decide whether a medicine is safe.
+- If the name is readable but strength is not, return the name and strength=null.
+- If the image is unreadable, return null values.
+"""
     parts = []
     if text: parts.append("Medication label text:\n" + text)
     if image: parts.append(data_url_part(image))

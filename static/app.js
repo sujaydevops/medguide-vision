@@ -1,6 +1,140 @@
-let current=null,currentReminder=null,lastResultText="",stream=null,authMode="login",account=null;
+let current=null,currentReminder=null,lastResultText="",stream=null,authMode="login",account=null,translatedText="";
+let translationCache={};
+let cachedVoices=[];
+
+function loadSpeechVoices(){
+  if(!("speechSynthesis" in window)) return;
+  cachedVoices=speechSynthesis.getVoices();
+}
+
+loadSpeechVoices();
+if("speechSynthesis" in window){
+  speechSynthesis.onvoiceschanged=loadSpeechVoices;
+}
+
+async function prepareTranslation(){
+  if(!current) return;
+
+  const languageName=getSelectedLanguage();
+
+  if(languageName==="English"){
+    translatedText="";
+    return;
+  }
+
+  const key=languageName+"|"+JSON.stringify(current);
+
+  if(translationCache[key]){
+    translatedText=translationCache[key];
+    return;
+  }
+
+  try{
+    const j=await post("/api/translate",{
+      language:languageName,
+      medication:current
+    });
+
+    if(j.explanation){
+      translationCache[key]=j.explanation;
+      translatedText=j.explanation;
+    }
+  }catch(e){
+    console.log("Background translation unavailable:",e.message);
+  }
+}
+
+const medGuideLanguages = [
+["English","en"],["Nepali","ne"],["Hindi","hi"],["Spanish","es"],
+["Chinese (Simplified)","zh-CN"],["Chinese (Traditional)","zh-TW"],
+["Arabic","ar"],["Bengali","bn"],["Portuguese","pt"],["Russian","ru"],
+["Japanese","ja"],["Korean","ko"],["French","fr"],["German","de"],
+["Italian","it"],["Dutch","nl"],["Turkish","tr"],["Vietnamese","vi"],
+["Thai","th"],["Indonesian","id"],["Malay","ms"],["Urdu","ur"],
+["Punjabi","pa"],["Gujarati","gu"],["Marathi","mr"],["Tamil","ta"],
+["Telugu","te"],["Kannada","kn"],["Malayalam","ml"],["Sinhala","si"],
+["Persian","fa"],["Hebrew","he"],["Greek","el"],["Polish","pl"],
+["Ukrainian","uk"],["Romanian","ro"],["Hungarian","hu"],["Czech","cs"],
+["Slovak","sk"],["Bulgarian","bg"],["Serbian","sr"],["Croatian","hr"],
+["Bosnian","bs"],["Slovenian","sl"],["Albanian","sq"],["Macedonian","mk"],
+["Swedish","sv"],["Norwegian","no"],["Danish","da"],["Finnish","fi"],
+["Icelandic","is"],["Estonian","et"],["Latvian","lv"],["Lithuanian","lt"],
+["Irish","ga"],["Welsh","cy"],["Catalan","ca"],["Basque","eu"],
+["Galician","gl"],["Afrikaans","af"],["Swahili","sw"],["Somali","so"],
+["Amharic","am"],["Hausa","ha"],["Yoruba","yo"],["Igbo","ig"],
+["Zulu","zu"],["Xhosa","xh"],["Filipino","fil"],["Burmese","my"],
+["Khmer","km"],["Lao","lo"],["Mongolian","mn"],["Kazakh","kk"],
+["Uzbek","uz"],["Azerbaijani","az"],["Armenian","hy"],["Georgian","ka"],
+["Pashto","ps"],["Kurdish","ku"],["Tajik","tg"],["Kyrgyz","ky"],
+["Maori","mi"],["Samoan","sm"],["Hawaiian","haw"],["Haitian Creole","ht"],
+["Esperanto","eo"],["Latin","la"],["Luxembourgish","lb"],["Maltese","mt"],
+["Belarusian","be"],["Moldovan / Romanian","ro-MD"],["Javanese","jv"],
+["Sundanese","su"],["Cebuano","ceb"],["Malagasy","mg"],["Shona","sn"],
+["Sesotho","st"],["Kinyarwanda","rw"],["Odia","or"],["Assamese","as"]
+];
+
+function populateLanguageSelectors(){
+ const setup=document.getElementById("language");
+ const dash=document.getElementById("dashboardLanguage");
+
+ [setup,dash].forEach(select=>{
+  if(!select)return;
+  select.innerHTML="";
+  medGuideLanguages.forEach(([name,code])=>{
+   const option=document.createElement("option");
+   option.value=name;
+   option.textContent=name;
+   option.dataset.lang=code;
+   select.appendChild(option);
+  });
+ });
+
+ if(setup)setup.value="English";
+ if(dash)dash.value=setup?.value||"English";
+
+ setup?.addEventListener("change",()=>{
+  if(dash)dash.value=setup.value;
+  translatedText="";
+ });
+
+ dash?.addEventListener("change",()=>{
+  if(setup)setup.value=dash.value;
+  translatedText="";
+ });
+}
+
+function getSelectedLanguage(){
+ const dash=document.getElementById("dashboardLanguage");
+ const setup=document.getElementById("language");
+ return dash?.value || setup?.value || "English";
+}
+
+function getLanguageCode(languageName){
+ const found=medGuideLanguages.find(([name])=>name===languageName);
+ return found ? found[1] : "en";
+}
+
 const demoPrescription={name:"Metformin",strength:"500 mg",quantity:"1 tablet",instructions:"Take 1 tablet at 8 AM and 1 tablet at 8 PM.",times:["08:00","20:00"],follow_up:"2026-10-20"};
-function show(id){document.querySelectorAll("main>section").forEach(x=>x.classList.add("hidden"));document.getElementById(id).classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});}
+function show(id){
+ if(id!=="scanner" && typeof stopLiveScan==="function"){
+   stopLiveScan(true);
+ }
+
+ document.querySelectorAll("main>section").forEach(
+   x=>x.classList.add("hidden")
+ );
+
+ const target=document.getElementById(id);
+
+ if(target){
+   target.classList.remove("hidden");
+ }
+
+ window.scrollTo({
+   top:0,
+   behavior:"smooth"
+ });
+}
 function openLogin(){
  if(account){show("dashboard");return;}
  authMode="login";authTitle.textContent="Welcome back";authSubmit.textContent="Sign in";authPassword.autocomplete="current-password";authModeToggle.textContent="New here? Create an account";authStatus.textContent="";show("auth");
@@ -86,11 +220,14 @@ async function analyzeRx(){
 }
 async function confirmRx(){
  if(reminderConsent.checked&&(!rFollow.reportValidity()||!reminderPhone.reportValidity()||!reminderTime.reportValidity()))return;
- const obj={name:rName.value||null,strength:rStrength.value||null,quantity:rQuantity.value||null,instructions:rInstructions.value||null,times:rTimes.value.split(",").map(x=>x.trim()).filter(Boolean),follow_up:rFollow.value||null,language:language.value,reminder_consent:reminderConsent.checked,phone_number:reminderPhone.value.trim(),reminder_time:reminderTime.value,timezone:reminderTimezone.value};
+ const obj={name:rName.value||null,strength:rStrength.value||null,quantity:rQuantity.value||null,instructions:rInstructions.value||null,times:rTimes.value.split(",").map(x=>x.trim()).filter(Boolean),follow_up:rFollow.value||null,language:getSelectedLanguage(),reminder_consent:reminderConsent.checked,phone_number:reminderPhone.value.trim(),reminder_time:reminderTime.value,timezone:reminderTimezone.value};
  confirmStatus.textContent="";
  try{const result=await post("/api/prescription/confirm",obj);current=result.medication;currentReminder=result.reminder;renderDashboard();show("dashboard");}catch(e){confirmStatus.textContent="Could not save the prescription: "+e.message;}
 }
 function renderDashboard(){
+ translatedText="";
+ const translationBox=document.getElementById("translation");
+ if(translationBox)translationBox.textContent="";
  const hasMedication=Boolean(current);
  dashboardEmpty.classList.toggle("hidden",hasMedication);dashboardRecord.classList.toggle("hidden",!hasMedication);
  if(!hasMedication)return;
@@ -103,9 +240,77 @@ function renderReminderStatus(){
  if(reminder.status==="scheduled"&&reminder.scheduled_for){const when=new Date(reminder.scheduled_for);text+=` Scheduled for ${new Intl.DateTimeFormat(undefined,{dateStyle:"medium",timeStyle:"short",timeZone:reminder.timezone}).format(when)} (${reminder.timezone}).`;}
  dReminder.textContent=text;
 }
-function speak(t){if(!("speechSynthesis" in window))return alert("Text-to-speech is unavailable in this browser.");speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(t));}
-function speakCurrent(){speak([current?.name,current?.strength,current?.instructions,(current?.times||[]).join(", ")].filter(Boolean).join(". "));}
-async function translateCurrent(){try{let j=await post("/api/translate",{language:language.value,medication:current});translation.textContent=j.explanation||"";}catch(e){translation.textContent="Translation error: "+e.message;}}
+function speak(text, languageName="English"){
+ if(!("speechSynthesis" in window)){
+   alert("Text-to-speech is unavailable in this browser.");
+   return;
+ }
+
+ if(!text)return;
+
+ speechSynthesis.cancel();
+
+ const utterance=new SpeechSynthesisUtterance(text);
+ const code=getLanguageCode(languageName);
+
+ utterance.lang=code;
+ utterance.rate=1.05;
+ utterance.pitch=1;
+ utterance.volume=1;
+
+ const voices=
+   cachedVoices.length
+   ? cachedVoices
+   : speechSynthesis.getVoices();
+
+ const prefix=code.toLowerCase().split("-")[0];
+
+ const voice=
+   voices.find(v=>v.lang.toLowerCase()===code.toLowerCase()) ||
+   voices.find(v=>v.lang.toLowerCase().startsWith(prefix));
+
+ if(voice){
+   utterance.voice=voice;
+ }
+
+ speechSynthesis.speak(utterance);
+}
+
+function speakCurrent(){
+ const original=[
+  current?.name,
+  current?.strength,
+  current?.instructions,
+  (current?.times||[]).join(", ")
+ ].filter(Boolean).join(". ");
+
+ const text=translatedText || original;
+ const lang=translatedText ? getSelectedLanguage() : "English";
+
+ speak(text,lang);
+}
+
+async function translateCurrent(){
+ const languageName=getSelectedLanguage();
+ translation.textContent="Creating explanation…";
+
+ try{
+  const j=await post("/api/translate",{
+   language:languageName,
+   medication:current
+  });
+
+  translatedText=j.explanation||"";
+  if(translatedText){
+    const key=languageName+"|"+JSON.stringify(current);
+    translationCache[key]=translatedText;
+  }
+  translation.textContent=translatedText || "No explanation returned.";
+ }catch(e){
+  translatedText="";
+  translation.textContent="Translation error: "+e.message;
+ }
+}
 async function startCamera(){
  scanStatus.textContent="Requesting camera access…";
  try{
@@ -116,6 +321,416 @@ async function startCamera(){
   scanStatus.textContent="Camera ready. Center the label in view, then capture it.";
  }catch(e){scanStatus.textContent="Camera unavailable: "+e.message+" You can upload a photo or enter visible label details below.";showManualLabelEntry();}
 }
+
+
+let liveScanActive = false;
+let liveScanTimer = null;
+let liveScanBusy = false;
+let liveScanAttempts = 0;
+let liveScanFinished = false;
+
+/*
+ * Fast live scanner
+ *
+ * Rules:
+ * 1. Only ONE Gemini request can run at a time.
+ * 2. Once Gemini returns a clear medication OR clear non-medication result,
+ *    scanning stops immediately.
+ * 3. The camera is stopped before showing the result.
+ * 4. Gemini/API errors do NOT create an infinite request loop.
+ * 5. Scan Again starts a completely fresh session.
+ */
+
+const LIVE_SCAN_INTERVAL = 1200;
+const LIVE_MAX_ATTEMPTS = 8;
+
+function clearLiveScanTimer(){
+    if(liveScanTimer){
+        clearTimeout(liveScanTimer);
+        liveScanTimer = null;
+    }
+}
+
+function setLiveStatus(message){
+    const el = document.getElementById("liveScanStatusText");
+    const normal = document.getElementById("scanStatus");
+
+    if(el) el.textContent = message;
+    if(normal) normal.textContent = message;
+}
+
+function setLiveButtons(running){
+    const startButton = document.getElementById("startCameraButton");
+    const stopButton = document.getElementById("stopLiveScanButton");
+
+    if(startButton){
+        startButton.classList.toggle("hidden", running);
+    }
+
+    if(stopButton){
+        stopButton.classList.toggle("hidden", !running);
+    }
+}
+
+function scheduleLiveScan(delay = LIVE_SCAN_INTERVAL){
+    clearLiveScanTimer();
+
+    if(!liveScanActive || liveScanFinished){
+        return;
+    }
+
+    liveScanTimer = setTimeout(runLiveScanFrame, delay);
+}
+
+async function startLiveScan(){
+    if(liveScanActive) return;
+
+    liveScanActive = true;
+    liveScanBusy = false;
+    liveScanFinished = false;
+    liveScanAttempts = 0;
+
+    const overlay = document.getElementById("liveScanOverlay");
+    const liveStatus = document.getElementById("liveScanStatus");
+    const startButton = document.getElementById("startCameraButton");
+    const stopButton = document.getElementById("stopLiveScanButton");
+
+    if(overlay) overlay.classList.remove("hidden");
+    if(liveStatus) liveStatus.classList.remove("hidden");
+
+    setLiveButtons(true);
+
+    try{
+        if(!stream){
+            if(!navigator.mediaDevices?.getUserMedia){
+                throw new Error("Camera access is unavailable in this browser.");
+            }
+
+            stream = await navigator.mediaDevices.getUserMedia({
+                video:{
+                    facingMode:{ideal:"environment"},
+                    width:{ideal:1280},
+                    height:{ideal:720}
+                },
+                audio:false
+            });
+
+            video.srcObject = stream;
+        }
+
+        await video.play();
+
+        setLiveStatus("Camera ready — hold the medication label inside the frame.");
+        scheduleLiveScan(300);
+
+    }catch(e){
+        stopLiveScan(true);
+        setLiveStatus("Camera unavailable: " + e.message);
+        showManualLabelEntry();
+    }
+}
+
+async function runLiveScanFrame(){
+    if(!liveScanActive || liveScanFinished) return;
+
+    if(liveScanBusy){
+        scheduleLiveScan(300);
+        return;
+    }
+
+    if(!video.videoWidth || !video.videoHeight){
+        scheduleLiveScan(500);
+        return;
+    }
+
+    if(liveScanAttempts >= LIVE_MAX_ATTEMPTS){
+        setLiveStatus("I couldn't read the label clearly. Move closer and try again.");
+        stopLiveScan(false);
+        return;
+    }
+
+    liveScanBusy = true;
+    liveScanAttempts++;
+
+    setLiveStatus(
+        liveScanAttempts === 1
+        ? "Reading the label…"
+        : "Still reading the label…"
+    );
+
+    try{
+        /*
+         * Smaller image = faster upload and faster Gemini processing.
+         */
+        const maxWidth = 720;
+        const scale = Math.min(
+            1,
+            maxWidth / video.videoWidth
+        );
+
+        canvas.width = Math.round(video.videoWidth * scale);
+        canvas.height = Math.round(video.videoHeight * scale);
+
+        const ctx = canvas.getContext("2d", {alpha:false});
+
+        ctx.drawImage(
+            video,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        const image = canvas.toDataURL("image/jpeg", .72);
+
+        const detected = await post("/api/label/analyze", {image});
+
+        /*
+         * A clear name means we have enough information to stop.
+         * A non-medication classification also stops.
+         */
+        const name = detected?.name
+            ? String(detected.name).trim()
+            : "";
+
+        const strength = detected?.strength
+            ? String(detected.strength).trim()
+            : "";
+
+        const confidence = detected?.confidence
+            ? String(detected.confidence).toLowerCase()
+            : "";
+
+        const isMedication =
+            detected?.is_medication !== false &&
+            (
+                name.length > 0 ||
+                confidence.includes("high") ||
+                confidence.includes("medium")
+            );
+
+        /*
+         * IMPORTANT:
+         * If Gemini has clearly identified something, STOP.
+         *
+         * This prevents:
+         * "Metformin detected..."
+         * then another scan
+         * then another scan
+         * then another scan.
+         */
+        if(name || detected?.is_medication === false){
+
+            liveScanFinished = true;
+            liveScanActive = false;
+            clearLiveScanTimer();
+
+            if(stream){
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+                video.srcObject = null;
+            }
+
+            setLiveButtons(false);
+
+            /*
+             * Non-medication result
+             */
+            if(detected?.is_medication === false){
+
+                const resultBox = document.getElementById("resultBox");
+
+                if(resultBox){
+                    resultBox.className = "result error";
+
+                    resultBox.innerHTML = `
+                        <h2>⚠ NOT A MEDICATION LABEL</h2>
+                        <p>
+                            The camera detected text, but it does not appear
+                            to be a medication label.
+                        </p>
+                        <hr>
+                        <p>
+                            <strong>Detected</strong><br>
+                            ${name || "Non-medication text"}
+                        </p>
+                    `;
+                }
+
+                lastResultText =
+                    "Not a medication label was detected. " +
+                    "Please show a pharmacy or medication label.";
+
+                show("result");
+                return;
+            }
+
+            /*
+             * Medication detected.
+             * Send it through the existing deterministic comparison.
+             */
+            await verifyDetected({
+                name:name || null,
+                strength:strength || null,
+                confidence:confidence || "detected"
+            });
+
+            return;
+        }
+
+        /*
+         * No useful information yet.
+         * Retry only while the scanner is active.
+         */
+        setLiveStatus("Hold the label steady inside the frame…");
+
+    }catch(e){
+
+        console.error("Live scan error:", e);
+
+        /*
+         * QUOTA / AUTH / SERVER errors should not hammer Gemini.
+         */
+        const message = String(e.message || "");
+
+        if(
+            message.includes("429") ||
+            message.includes("RESOURCE_EXHAUSTED") ||
+            message.includes("quota")
+        ){
+            setLiveStatus(
+                "Gemini is temporarily out of quota. " +
+                "You can upload the label instead."
+            );
+
+            stopLiveScan(false);
+            return;
+        }
+
+        if(e.status === 401){
+            setLiveStatus("Please sign in to continue.");
+            stopLiveScan(false);
+            return;
+        }
+
+        /*
+         * Temporary error:
+         * one controlled retry instead of an endless loop.
+         */
+        setLiveStatus("Couldn't read that frame. Trying once more…");
+
+    }finally{
+        liveScanBusy = false;
+
+        if(
+            liveScanActive &&
+            !liveScanFinished &&
+            liveScanAttempts < LIVE_MAX_ATTEMPTS
+        ){
+            scheduleLiveScan(LIVE_SCAN_INTERVAL);
+        }
+    }
+}
+
+function stopLiveScan(stopCamera = true){
+    liveScanActive = false;
+    liveScanBusy = false;
+    liveScanFinished = true;
+
+    clearLiveScanTimer();
+
+    const overlay = document.getElementById("liveScanOverlay");
+    const liveStatus = document.getElementById("liveScanStatus");
+    const startButton = document.getElementById("startCameraButton");
+    const stopButton = document.getElementById("stopLiveScanButton");
+
+    if(overlay) overlay.classList.add("hidden");
+    if(liveStatus) liveStatus.classList.add("hidden");
+
+    setLiveButtons(false);
+
+    if(stopCamera && stream){
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+
+        if(video){
+            video.srcObject = null;
+        }
+    }
+}
+
+async function startCamera(){
+    /*
+     * Start normal camera preview.
+     */
+    stopLiveScan(true);
+
+    scanStatus.textContent = "Requesting camera access…";
+
+    try{
+        if(!navigator.mediaDevices?.getUserMedia){
+            throw new Error(
+                "Camera access is unavailable. Upload a label photo instead."
+            );
+        }
+
+        stream = await navigator.mediaDevices.getUserMedia({
+            video:{
+                facingMode:{ideal:"environment"},
+                width:{ideal:1280},
+                height:{ideal:720}
+            },
+            audio:false
+        });
+
+        video.srcObject = stream;
+        await video.play();
+
+        scanStatus.textContent =
+            "Camera ready. Hold the label steady and start live scan.";
+
+    }catch(e){
+        scanStatus.textContent =
+            "Camera unavailable: " +
+            e.message +
+            " You can upload a label photo instead.";
+
+        showManualLabelEntry();
+    }
+}
+
+async function captureLabel(){
+    if(!stream){
+        return scanStatus.textContent =
+            "Start the camera first, or upload a label photo.";
+    }
+
+    if(!video.videoWidth || !video.videoHeight){
+        return scanStatus.textContent =
+            "The camera is still starting. Wait for the preview.";
+    }
+
+    const scale = Math.min(
+        1,
+        960 / video.videoWidth
+    );
+
+    canvas.width = Math.round(video.videoWidth * scale);
+    canvas.height = Math.round(video.videoHeight * scale);
+
+    canvas.getContext("2d").drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    await analyzeImage(
+        canvas.toDataURL("image/jpeg", .78)
+    );
+}
+
 async function captureLabel(){
  if(!stream)return scanStatus.textContent="Start the camera first, or upload a label photo.";
  if(!video.videoWidth||!video.videoHeight)return scanStatus.textContent="The camera is still starting. Wait for the preview, then capture again.";
@@ -137,13 +752,59 @@ async function verifyManualLabel(){
 }
 async function analyzeImage(image){
  scanStatus.textContent="Gemini is reading the label…";
- try{const d=await post("/api/label/analyze",{image});await verifyDetected(d);}
- catch(e){
-  scanStatus.textContent=`Gemini label analysis failed: ${e.message}`;
-  manualLabelReason.textContent="Gemini could not read this label. You can still enter the visible details yourself; this will be compared without AI and will not be presented as Gemini analysis.";
-  showManualLabelEntry(image);
+
+ try{
+   const d=await post("/api/label/analyze",{image});
+
+   /*
+    * Manual/upload scans are one-shot.
+    * Never automatically rescan.
+    */
+   await verifyDetected(d);
+
+ }catch(e){
+
+   const msg=String(e.message||"");
+
+   if(
+      msg.includes("429") ||
+      msg.includes("RESOURCE_EXHAUSTED") ||
+      msg.includes("quota")
+   ){
+      scanStatus.textContent=
+        "Gemini is temporarily out of quota. Try again later or use manual entry.";
+      return;
+   }
+
+   scanStatus.textContent=
+      "Gemini could not read this label.";
+
+   manualLabelReason.textContent=
+      "The label could not be read reliably. " +
+      "Enter only details that are clearly visible.";
+
+   showManualLabelEntry(image);
  }
 }
-async function verifyDetected(d){const v=await post("/api/verify",{expected:current,detected:d});const labels={MATCH:["✓ LABEL MATCH","Label matches stored prescription information.","match"],MEDICINE_MISMATCH:["⚠ MEDICATION MISMATCH","The detected medication name does not match the stored prescription.","error"],STRENGTH_MISMATCH:["⚠ STRENGTH MISMATCH","The detected strength does not match the stored prescription.","error"],REVIEW_REQUIRED:["⚠ REVIEW REQUIRED","The strength could not be verified. Check the prescription or pharmacy label.","warn"],UNREADABLE:["⚠ UNABLE TO READ LABEL","Medication information could not be reliably read. Try scanning again.","warn"]};const a=labels[v.status]||labels.UNREADABLE;lastResultText=`${a[0]}. ${a[1]} Expected ${current?.name||"unknown"} ${current?.strength||""}. Detected ${d.name||"unknown"} ${d.strength||"strength unavailable"}.`;resultBox.className="result "+a[2];resultBox.innerHTML=`<h2>${a[0]}</h2><p>${a[1]}</p><hr><p><strong>Expected</strong><br>${current?.name||"—"} · ${current?.strength||"—"}</p><p><strong>Detected</strong><br>${d.name||"—"} · ${d.strength||"—"}</p>`;show("result");}
-function speakResult(){speak(lastResultText);}
+async function verifyDetected(d){
+ /*
+  * Any completed verification ends live scanning first.
+  */
+ if(typeof liveScanActive !== "undefined" && liveScanActive){
+    liveScanFinished=true;
+    liveScanActive=false;
+    clearLiveScanTimer();
+
+    if(stream){
+       stream.getTracks().forEach(track=>track.stop());
+       stream=null;
+       if(video)video.srcObject=null;
+    }
+
+    setLiveButtons(false);
+ }
+
+ const v=await post("/api/verify",{expected:current,detected:d});const labels={MATCH:["✓ LABEL MATCH","Label matches stored prescription information.","match"],MEDICINE_MISMATCH:["⚠ MEDICATION MISMATCH","The detected medication name does not match the stored prescription.","error"],STRENGTH_MISMATCH:["⚠ STRENGTH MISMATCH","The detected strength does not match the stored prescription.","error"],REVIEW_REQUIRED:["⚠ REVIEW REQUIRED","The strength could not be verified. Check the prescription or pharmacy label.","warn"],UNREADABLE:["⚠ UNABLE TO READ LABEL","Medication information could not be reliably read. Try scanning again.","warn"]};const a=labels[v.status]||labels.UNREADABLE;lastResultText=`${a[0]}. ${a[1]} Expected ${current?.name||"unknown"} ${current?.strength||""}. Detected ${d.name||"unknown"} ${d.strength||"strength unavailable"}.`;resultBox.className="result "+a[2];resultBox.innerHTML=`<h2>${a[0]}</h2><p>${a[1]}</p><hr><p><strong>Expected</strong><br>${current?.name||"—"} · ${current?.strength||"—"}</p><p><strong>Detected</strong><br>${d.name||"—"} · ${d.strength||"—"}</p>`;show("result");}
+function speakResult(){speak(lastResultText,"English");}
+populateLanguageSelectors();
 initializeApp();
