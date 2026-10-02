@@ -8,7 +8,7 @@ __pycache__/
 .gitignore
 .venv-1
 FRONTEND_DESIGN.md
-Web design 
+/Web design /
 .env.example
 app.py
 .venv-1
